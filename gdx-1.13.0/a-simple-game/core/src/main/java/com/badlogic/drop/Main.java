@@ -7,27 +7,23 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class Main implements ApplicationListener {
     SpriteBatch spriteBatch;
-    FitViewport viewport;
+    ScreenViewport viewport;
 
-    // Texturas do botão
     Texture bitOnTexture;
     Texture bitOffTexture;
     Texture oneTexture;
     Texture zeroTexture;
 
-    // Estado do bit (true = 1, false = 0)
     boolean bitState;
 
-    // Posição e tamanho do botão
     Rectangle buttonBounds;
     Vector2 buttonPosition;
     float buttonSize;
 
-    // Para detectar cliques
     Vector2 touchPos;
 
     public Preloader preloader;
@@ -35,9 +31,7 @@ public class Main implements ApplicationListener {
     @Override
     public void create() {
         spriteBatch = new SpriteBatch();
-        viewport = new FitViewport(8, 5);
-
-        // Inicializa estado como 0 (false)
+        viewport = new ScreenViewport(); // Usa pixels 1:1 da tela
         bitState = false;
 
         // Carrega as texturas
@@ -52,26 +46,39 @@ public class Main implements ApplicationListener {
             System.out.println("Verifique se os arquivos estao em: assets/textures/bits/");
         }
 
-        // Posiciona o bit de entrada no centro da tela
-        buttonSize = 1.5f;
+
+        buttonSize = 150f;
+        updateButtonPosition();
+        touchPos = new Vector2();
+    }
+
+    // centraliza botao na tela
+    private void updateButtonPosition() {
+
+        float screenWidth = Gdx.graphics.getWidth();
+        float screenHeight = Gdx.graphics.getHeight();
+
+        // botao posicionado a esquerda do centro
         buttonPosition = new Vector2(
-            viewport.getWorldWidth() / 2 - buttonSize / 2,
-            viewport.getWorldHeight() / 2 - buttonSize / 2
+            screenWidth / 2 - buttonSize / 2 - 200,
+            screenHeight / 2 - buttonSize / 2
         );
 
         buttonBounds = new Rectangle(
-            buttonPosition.x - buttonSize, // Ajuste para considerar o número ao lado
+            buttonPosition.x,
             buttonPosition.y,
             buttonSize,
             buttonSize
         );
 
-        touchPos = new Vector2();
+        System.out.println("Botao posicionado em: (" + buttonPosition.x + ", " + buttonPosition.y + ")");
+        System.out.println("Tamanho da tela: " + screenWidth + "x" + screenHeight + " pixels");
     }
 
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
+        updateButtonPosition(); // Reposiciona o botão quando redimensionar a janela
     }
 
     @Override
@@ -84,13 +91,14 @@ public class Main implements ApplicationListener {
         // Detecta clique/toque
         if (Gdx.input.justTouched()) {
             touchPos.set(Gdx.input.getX(), Gdx.input.getY());
-            viewport.unproject(touchPos); // Converte coordenadas da tela para o mundo
+
+            System.out.println("Clique detectado em: (" + (int)touchPos.x + ", " + (int)touchPos.y + ") pixels");
 
             // Verifica se clicou no botão
             if (buttonBounds.contains(touchPos.x, touchPos.y)) {
                 // Alterna o estado do bit
                 bitState = !bitState;
-                System.out.println("Bit alternado! Novo estado: " + (bitState ? "1" : "0"));
+                System.out.println("Bit alternado - estado: " + (bitState ? "1" : "0"));
             }
         }
     }
@@ -103,8 +111,8 @@ public class Main implements ApplicationListener {
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
         spriteBatch.begin();
 
-        // Desenha o botao (fundo)
-        Texture currentButtonTexture = bitState ? bitOnTexture : bitOffTexture;
+        // Desenha o botao com numero
+        Texture currentButtonTexture = bitState ? oneTexture : zeroTexture;
         if (currentButtonTexture != null) {
             spriteBatch.draw(
                 currentButtonTexture,
@@ -115,16 +123,19 @@ public class Main implements ApplicationListener {
             );
         }
 
-        // Desenha o número (1 ou 0) ao lado do botao
-        Texture currentNumberTexture = bitState ? oneTexture : zeroTexture;
-        if (currentNumberTexture != null) {
-            // Centraliza o botao numero
-            float numberSize = buttonSize * 0.6f; // numero menor que o botao
-            float numberX = buttonPosition.x + (buttonSize - numberSize) / 2 - buttonSize; // Desenha a esquerda do bit de entrada
-            float numberY = buttonPosition.y + (buttonSize - numberSize) / 2;
+        // Desenha o bit de input
+        Texture currentInputTexture = bitState ? bitOnTexture : bitOffTexture;
+        if (currentInputTexture != null) {
+
+            float screenWidth = Gdx.graphics.getWidth();
+            float screenHeight = Gdx.graphics.getHeight();
+
+            float numberSize = buttonSize;
+            float numberX = screenWidth / 2 - numberSize / 2;
+            float numberY = screenHeight / 2 - numberSize / 2;
 
             spriteBatch.draw(
-                currentNumberTexture,
+                currentInputTexture,
                 numberX,
                 numberY,
                 numberSize,
@@ -137,12 +148,14 @@ public class Main implements ApplicationListener {
 
     @Override
     public void pause() {
-        // Não precisa fazer nada
+
+
     }
 
     @Override
     public void resume() {
-        // Não precisa fazer nada
+
+
     }
 
     @Override
