@@ -4,27 +4,28 @@ package com.badlogic.drop.entities.gates;
 // suporta mais do que duas entradas
 
 public class ANDGate extends LogicGate {
-    
+
     // constroi a porta com 2 entradas por default
     public ANDGate(float x, float y) {
         super(2, x, y); // default 2
         this.gateType = "AND";
     }
-    
+
     // constroi a porta com número customizado de entradas
     public ANDGate(int numInputs, float x, float y) {
         super(numInputs, x, y);
         this.gateType = "AND";
     }
-    
+
     @Override
-    public boolean compute() {
+    public void compute() {
         // retorna verdadeiro se nenhuma entrada for falsa
         for (boolean input : inputs) {
             if (!input) {
-                return false;
+                this.output = false;
+                return;
             }
         }
-        return true;
+        this.output = true;
     }
 }

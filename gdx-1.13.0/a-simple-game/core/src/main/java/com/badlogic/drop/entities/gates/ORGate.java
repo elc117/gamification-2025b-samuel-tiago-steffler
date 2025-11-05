@@ -4,7 +4,7 @@ package com.badlogic.drop.entities.gates;
 // pode ser construida com mais de duas entradas
 
 public class ORGate extends LogicGate {
-    
+
     // construtor padrão da porta OR
     public ORGate(float x, float y) {
         super(2, x, y); // default 2
@@ -16,15 +16,16 @@ public class ORGate extends LogicGate {
         super(numInputs, x, y);
         this.gateType = "OR";
     }
-    
+
     @Override
-    public boolean compute() {
+    public void compute() {
         // retorna verdadeiro se pelo menos uma entrada for verdadeira
         for (boolean input : inputs) {
             if (input) {
-                return true;
+                this.output = true;
+                return;
             }
         }
-        return false;
+        this.output = false;
     }
 }

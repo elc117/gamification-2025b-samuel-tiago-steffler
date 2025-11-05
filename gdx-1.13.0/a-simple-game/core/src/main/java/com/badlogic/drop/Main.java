@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.drop.logic.CircuitTester;
 
 public class Main implements ApplicationListener {
     SpriteBatch spriteBatch;
@@ -46,9 +45,6 @@ public class Main implements ApplicationListener {
             System.out.println("ERRO ao carregar texturas: " + e.getMessage());
             System.out.println("Verifique se os arquivos estao em: assets/textures/bits/");
         }
-
-        // Testa todas as portas lógicas
-        CircuitTester.testAllGates();
 
         buttonSize = 150f;
         updateButtonPosition();

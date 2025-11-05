@@ -4,21 +4,21 @@ package com.badlogic.drop.entities.gates;
 // retorna verdadeiro se o numero de entradas verdadeiras for impar (varias entradas)
 
 public class XORGate extends LogicGate {
-    
+
     // construtor padrao para a porta XOR 2 entradas
     public XORGate(float x, float y) {
         super(2, x, y); // default 2
         this.gateType = "XOR";
     }
-    
+
     // construtor para porta XOR com varias entradas
     public XORGate(int numInputs, float x, float y) {
         super(numInputs, x, y);
         this.gateType = "XOR";
     }
-    
+
     @Override
-    public boolean compute() {
+    public void compute() {
         // conta o numero de portas verdadeiras, retorna verdadeiro se for impar
         int trueCount = 0;
         for (boolean input : inputs) {
@@ -26,6 +26,6 @@ public class XORGate extends LogicGate {
                 trueCount++;
             }
         }
-        return trueCount % 2 == 1;
+        this.output = trueCount % 2 == 1;
     }
 }
