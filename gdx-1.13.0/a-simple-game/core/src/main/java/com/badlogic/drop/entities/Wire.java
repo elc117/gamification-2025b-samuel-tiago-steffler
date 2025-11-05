@@ -1,7 +1,200 @@
 package com.badlogic.drop.entities;
 
-// Elemento fio que conecta portas logicas no circuito
+import com.badlogic.drop.entities.gates.LogicGate;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
+//classe que armazena as conexões entre portas lógicas
 public class Wire {
 
+    protected boolean state;        // estado do fio (true/false)
+    protected LogicGate fromGate;   // porta de origem
+    protected LogicGate toGate;     // porta de destino
+    protected int fromOutputIndex;  // saída da porta de origem (dificilmente será diferente de 0)
+    protected int toInputIndex;     // entrada da porta de destino
+    
+    // Coordenadas dos pontos de conexão (output da origem, input do destino)
+    protected float fromX, fromY;   // coordenadas de origem
+    protected float toX, toY;       // coordenadas de destino
+    
+    // Pontos de controle para renderizar (para criar o caminho do fio)
+    protected Array<Vector2> pathPoints;
+    
+    // Comprimento do segmento reto ao sair/entrar nas portas
+    protected float seglen = 30f;
+
+    // Espessura da linha do fio
+    protected float lineWidth = 4f;
+    
+    // Cores para diferentes estados
+    protected Color activeColor;    // cor quando true
+    protected Color inactiveColor;  // cor quando false
+
+    /**
+     * Construtor de Wire padrao conectando a saída 0 de uma porta à entrada 0 de outra porta
+     */
+    public Wire(LogicGate fromGate, LogicGate toGate) {
+        this(fromGate, 0, toGate, 0);
+    }
+    
+    /**
+     * Cria um fio com índices específicos de entrada/saída
+     * @param fromGate Porta de origem
+     * @param fromOutputIndex Índice da saída da porta de origem (geralmente 0)
+     * @param toGate Porta de destino
+     * @param toInputIndex Índice da entrada da porta de destino
+     */
+    public Wire(LogicGate fromGate, int fromOutputIndex, LogicGate toGate, int toInputIndex) {
+        this.state = false;
+        this.fromGate = fromGate;
+        this.toGate = toGate;
+        this.fromOutputIndex = fromOutputIndex;
+        this.toInputIndex = toInputIndex;
+        
+        // Cores padrão
+        this.inactiveColor = new Color(1f, 1f, 1f, 1f);    // Branco quando inativo
+        this.activeColor = new Color(0x00d4ffff);           // #00d4ffff quando ativo
+        
+        // Inicializa array de pontos
+        this.pathPoints = new Array<>();
+        
+        // Calcula posições de conexão
+        updateConnectionPoints();
+    }
+    
+    /**
+     * Atualiza as coordenadas de conexão baseado nas posições das portas.
+     * Será chamado para a geração inicial do circuito, mas também pode ser chamado ao mover as portas.
+     */
+    public void updateConnectionPoints() {
+        // Por enquanto, usa o centro das portas
+        // TODO: ajustar para usar posições exatas dos pinos de entrada/saída (libGSX renderiza a partir do canto superior esquerdo)
+
+        // saida: coordenada X no meio da porta de origem (gate.X + width / 2)
+        //        coordenada Y baseada da porta de origem - altura (gate.Y + height)
+        this.fromX = fromGate.getX() + fromGate.getWidth() / 2;
+        this.fromY = fromGate.getY();
+
+        // entrada: coordenada X baseada na entrada da porta de destino (gate.X + (width / numInputs) * inputIndex)
+        //          coordenada Y na base da porta de destino (gate.Y - altura da imagem)
+        this.toX = toGate.getX() + (toGate.getWidth() / toGate.getNumInputs()) * this.toInputIndex; // entrada por baixo (circuito vertical)
+        this.toY = toGate.getY() - fromGate.getHeight();
+        
+        // Recalcula o caminho
+        calculatePath();
+    }
+    
+    /**
+     * Calcula os pontos do caminho do fio:
+     * 1. Sai reto (horizontal) da porta de origem
+     * 2. Segmento diagonal ou vertical se necessário
+     * 3. Entra reto (horizontal) na porta de destino
+     */
+    protected void calculatePath() {
+        pathPoints.clear();
+        
+        // Ponto inicial (saída da porta de origem)
+        pathPoints.add(new Vector2(fromX, fromY));
+        
+        // Ponto após segmento reto inicial (saindo para a direita)
+        float midX1 = fromX + seglen;
+        pathPoints.add(new Vector2(midX1, fromY));
+        
+        // Ponto antes do segmento reto final (entrando pela esquerda)
+        float midX2 = toX - seglen;
+        pathPoints.add(new Vector2(midX2, toY));
+        
+        // Ponto final (entrada da porta de destino)
+        pathPoints.add(new Vector2(toX, toY));
+        
+        // Se os segmentos retos se sobrepõem, simplifica o caminho
+        if (midX1 >= midX2) {
+            pathPoints.clear();
+            float midX = (fromX + toX) / 2;
+            pathPoints.add(new Vector2(fromX, fromY));
+            pathPoints.add(new Vector2(midX, fromY));
+            pathPoints.add(new Vector2(midX, toY));
+            pathPoints.add(new Vector2(toX, toY));
+        }
+    }
+    
+    /**
+     * Atualiza o estado do fio baseado na saída da porta de origem
+     */
+    public void updateState() {
+        if (fromGate != null) {
+            this.state = fromGate.getOutput();
+        }
+    }
+
+    // Getters e Setters
+    
+    public boolean getState() {
+        return state;
+    }
+
+    public void setState(boolean state) {
+        this.state = state;
+    }
+    
+    public LogicGate getFromGate() {
+        return fromGate;
+    }
+    
+    public LogicGate getToGate() {
+        return toGate;
+    }
+    
+    public int getFromOutputIndex() {
+        return fromOutputIndex;
+    }
+    
+    public int getToInputIndex() {
+        return toInputIndex;
+    }
+    
+    public Array<Vector2> getPathPoints() {
+        return pathPoints;
+    }
+    
+    public float getLineWidth() {
+        return lineWidth;
+    }
+    
+    public void setLineWidth(float lineWidth) {
+        this.lineWidth = lineWidth;
+    }
+    
+    public float getSeglen() {
+        return seglen;
+    }
+    
+    public void setSeglen(float length) {
+        this.seglen = length;
+        calculatePath(); // Recalcula quando muda
+    }
+    
+    /**
+     * Retorna a cor atual baseada no estado do fio
+     */
+    public Color getCurrentColor() {
+        return state ? activeColor : inactiveColor;
+    }
+    
+    public Color getActiveColor() {
+        return activeColor;
+    }
+    
+    public void setActiveColor(Color color) {
+        this.activeColor = color;
+    }
+    
+    public Color getInactiveColor() {
+        return inactiveColor;
+    }
+    
+    public void setInactiveColor(Color color) {
+        this.inactiveColor = color;
+    }
 }
