@@ -40,19 +40,19 @@ public class Main implements ApplicationListener {
         // Inicializa estado como 0 (false)
         bitState = false;
 
-        // Carrega as texturas (converter SVG para PNG antes!)
-        // Por enquanto, vai dar erro até você adicionar os arquivos
+        // Carrega as texturas
         try {
-            bitOnTexture = new Texture("bits/bitOn.png");
-            bitOffTexture = new Texture("bits/bitOff.png");
-            oneTexture = new Texture("bits/one.png");
-            zeroTexture = new Texture("bits/zero.png");
+            bitOnTexture = new Texture("textures/bits/in_on.png");
+            bitOffTexture = new Texture("textures/bits/in_off.png");
+            oneTexture = new Texture("textures/bits/one.png");
+            zeroTexture = new Texture("textures/bits/zero.png");
+            System.out.println("Texturas carregadas com sucesso!");
         } catch (Exception e) {
-            System.out.println("Texturas não encontradas! Converta os SVGs para PNG primeiro.");
-            System.out.println("Coloque em: assets/bits/");
+            System.out.println("ERRO ao carregar texturas: " + e.getMessage());
+            System.out.println("Verifique se os arquivos estao em: assets/textures/bits/");
         }
 
-        // Posiciona o botão no centro da tela
+        // Posiciona o bit de entrada no centro da tela
         buttonSize = 1.5f;
         buttonPosition = new Vector2(
             viewport.getWorldWidth() / 2 - buttonSize / 2,
@@ -60,7 +60,7 @@ public class Main implements ApplicationListener {
         );
 
         buttonBounds = new Rectangle(
-            buttonPosition.x,
+            buttonPosition.x - buttonSize, // Ajuste para considerar o número ao lado
             buttonPosition.y,
             buttonSize,
             buttonSize
@@ -103,7 +103,7 @@ public class Main implements ApplicationListener {
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
         spriteBatch.begin();
 
-        // Desenha o botão (fundo)
+        // Desenha o botao (fundo)
         Texture currentButtonTexture = bitState ? bitOnTexture : bitOffTexture;
         if (currentButtonTexture != null) {
             spriteBatch.draw(
@@ -113,18 +113,14 @@ public class Main implements ApplicationListener {
                 buttonSize,
                 buttonSize
             );
-        } else {
-            // Fallback: desenha um retângulo colorido se não tiver textura
-            // (Você precisa adicionar ShapeRenderer se quiser isso)
-            System.out.println("Textura do botão não carregada!");
         }
 
-        // Desenha o número (1 ou 0) sobreposto ao botão
+        // Desenha o número (1 ou 0) ao lado do botao
         Texture currentNumberTexture = bitState ? oneTexture : zeroTexture;
         if (currentNumberTexture != null) {
-            // Centraliza o número no botão
-            float numberSize = buttonSize * 0.6f; // Número menor que o botão
-            float numberX = buttonPosition.x + (buttonSize - numberSize) / 2;
+            // Centraliza o botao numero
+            float numberSize = buttonSize * 0.6f; // numero menor que o botao
+            float numberX = buttonPosition.x + (buttonSize - numberSize) / 2 - buttonSize; // Desenha a esquerda do bit de entrada
             float numberY = buttonPosition.y + (buttonSize - numberSize) / 2;
 
             spriteBatch.draw(

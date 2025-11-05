@@ -41,6 +41,13 @@ A simple game from the libGDX wiki tutorials.
    
       ```
       .\gradlew html:distZip
+
+      ```
+   6. executar localmente
+   
+      ```
+      cd gdx-1.13.0\a-simple-game
+      .\gradlew.bat lwjgl3:run
       ```
 
 # Para versionamento
