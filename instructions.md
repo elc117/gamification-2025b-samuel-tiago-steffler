@@ -42,3 +42,20 @@ A simple game from the libGDX wiki tutorials.
       ```
       .\gradlew html:distZip
       ```
+
+# Para versionamento
+
+## 1. commit das mudanças
+git add .
+git commit -m "descricao"
+
+## 2. criar a tag
+git tag -a (versao) -m "Release (versao) - nome da versao"
+git push origin (versao)
+
+## 3. push tudo
+git push origin master
+git push origin (versao)
+
+> usando git lens
+repositories -> tags -> create tag -> nome -> push to remote
