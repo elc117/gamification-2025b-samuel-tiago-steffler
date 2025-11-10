@@ -9,6 +9,9 @@ public class NOTGate extends LogicGate {
     public NOTGate(float x, float y) {
         super(1, x, y); // maximo 1 entrada
         this.gateType = "NOT";
+        // Tamanho do icone PNG 
+        this.width = 131f;
+        this.height = 154f;
     }
 
     @Override

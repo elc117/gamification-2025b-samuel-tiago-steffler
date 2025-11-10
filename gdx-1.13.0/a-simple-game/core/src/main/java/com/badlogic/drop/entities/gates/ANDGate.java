@@ -9,12 +9,20 @@ public class ANDGate extends LogicGate {
     public ANDGate(float x, float y) {
         super(2, x, y); // default 2
         this.gateType = "AND";
+        
+        // Tamanho do icone PNG 
+        this.width = 131f;
+        this.height = 154f;
     }
 
     // constroi a porta com número customizado de entradas
     public ANDGate(int numInputs, float x, float y) {
         super(numInputs, x, y);
         this.gateType = "AND";
+        
+        // Tamanho específico para gates (131x154 pixels)
+        this.width = 131f;
+        this.height = 154f;
     }
 
     @Override

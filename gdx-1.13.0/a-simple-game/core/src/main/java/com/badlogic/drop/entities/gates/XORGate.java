@@ -9,12 +9,17 @@ public class XORGate extends LogicGate {
     public XORGate(float x, float y) {
         super(2, x, y); // default 2
         this.gateType = "XOR";
+        // Tamanho do icone PNG 
+        this.width = 131f;
+        this.height = 154f;
     }
 
     // construtor para porta XOR com varias entradas
     public XORGate(int numInputs, float x, float y) {
         super(numInputs, x, y);
         this.gateType = "XOR";
+        this.width = 131f;
+        this.height = 154f;
     }
 
     @Override
