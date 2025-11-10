@@ -1,6 +1,7 @@
 package com.badlogic.drop.entities.gates;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
 // superclasse abstrata para todas as portas logicas
@@ -26,12 +27,10 @@ public abstract class LogicGate {
     // disposicao horizontal para o nivel de portas (usado pelo renderizador)
     protected int levelIdx;
 
-    /**
-     * Construtor de uma porta lógica com um número de entradas específicas
-     * @param numInputs Número de entradas da porta lógica
-     * @param x Posição X na tela
-     * @param y Posição Y na tela
-     */
+    // Construtor da porta logica com um numero de entradas especificas
+    // numInputs - numero de entradas da porta logica
+    // x - posição X na tela
+    // y - posição Y na tela
     public LogicGate(int numInputs, float x, float y) {
         this.numInputs = numInputs;
         this.inputs = new boolean[numInputs];
@@ -92,22 +91,17 @@ public abstract class LogicGate {
         this.position.set(x, y);
     }
 
-    /**
-     * Método abstrato para computar a saída da porta lógica.
-     * Implementação cabe a cada tipo de porta.
-     * @return O valor de saída computado
-     */
+   // computa a saida da porta logica (abstrato)
+   // retorno: valor de saida computado
     public abstract void compute();
 
-    /**
-     * Atualiza a saída da porta com base nas entradas atuais
-     */
+
+    //Atualiza a saida da porta com base nas entradas atuais
     public void update() {
         compute();
     }
 
     // Getters e Setters
-
     public Texture getTexture() {
         return texture;
     }
@@ -152,21 +146,18 @@ public abstract class LogicGate {
         return inputs;
     }
 
-    /**
-     * Set do valor de uma porta específica
-     * @param index Índice da entrada (0 - numInputs-1)
-     * @param value Valor booleano para a entrada
-     */
+
+   // Set do valor de uma porta especifica
+   // index - indice da entrada
+   // value - valor booleano para a entrada
     public void setInput(int index, boolean value) {
         if (index >= 0 && index < numInputs) {
             inputs[index] = value;
         }
     }
 
-    /**
-     * Set de todas as entradas simultaneamente
-     * @param inputs Array de valores booleanos
-     */
+    // Set de todas as entradas simultaneamente
+    // inputs - array de valores booleanos
     public void setInputs(boolean[] inputs) {
         if (inputs.length == this.numInputs) {
             System.arraycopy(inputs, 0, this.inputs, 0, numInputs);
@@ -201,9 +192,15 @@ public abstract class LogicGate {
         this.levelIdx = levelIdx;
     }
 
-    /**
-     * Descarta recursos quando a porta não for mais necessária
-     */
+
+    // Renderiza a porta logica na tela
+    // - batch: SpriteBatch usado para desenhar a textura
+    public void render(SpriteBatch batch) {
+        if (texture != null) {
+            batch.draw(texture, position.x, position.y, width, height);
+        }
+    }
+
     public void dispose() {
         if (texture != null) {
             texture.dispose();
