@@ -9,12 +9,17 @@ public class XNORGate extends LogicGate {
     public XNORGate(float x, float y) {
         super(2, x, y); // default 2
         this.gateType = "XNOR";
+        // Tamanho do icone PNG 
+        this.width = 131f;
+        this.height = 154f;
     }
 
     // construtor para porta XNOR com varias entradas
     public XNORGate(int numInputs, float x, float y) {
         super(numInputs, x, y);
         this.gateType = "XNOR";
+        this.width = 131f;
+        this.height = 154f;
     }
 
     @Override

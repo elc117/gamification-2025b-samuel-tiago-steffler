@@ -21,14 +21,18 @@ public class Circuit {
     // Conexões
     private Wire[] wires;
     
-    // Expected outputs
+    // Saídas esperadas
     private boolean[] expectedOutput;
     
-    // Evaluation order (topological sort result)
+    // Ordem de avaliacao e atualzacao das portas logicas
     private Array<LogicGate> evaluationOrder;
     
-    // Dependency tracking
-    private ObjectMap<LogicGate, Array<LogicGate>> dependencies; // gate -> gates it depends on
+    // par de porta e array de portas das quais depende (geralmente 1 ou 2)
+    private ObjectMap<LogicGate, Array<LogicGate>> dependencies; 
+    
+    // organizacao espacial dos gates
+    private Array<Array<LogicGate>> levels; // levels[i] = array dos gates no nivel i
+    private int maxLevel;
     
     /**
      * @param inputs Nós de entrada (herdam de LogicGate)
@@ -59,9 +63,11 @@ public class Circuit {
         
         this.dependencies = new ObjectMap<>();
         this.evaluationOrder = new Array<>();
+        this.levels = new Array<>();
         
         buildDependencyGraph();
         computeEvaluationOrder();
+        computeLevels();
     }
     
     /**
@@ -128,6 +134,89 @@ public class Circuit {
         // Verifica se há ciclos
         if (evaluationOrder.size != allGates.length) {
             throw new IllegalStateException("Circuito contém laços (estilo latches)! Reevaluar expressão.");
+        }
+    }
+    
+    /**
+     * Função para calcular o nível de cada logic gate a partir das entradas com BFS.
+     * Inputs ficam no nível 0, outputs no nível mais alto.
+     */
+    private void computeLevels() {
+        levels.clear();
+        
+        // par de gate e nível
+        ObjectMap<LogicGate, Integer> gateLevels = new ObjectMap<>();
+        
+        // Inputs começam no nível 0
+        for (InputBits input : inputs) {
+            gateLevels.put(input, 0);
+        }
+        
+        // Processa gates na ordem de avaliação
+        for (LogicGate gate : evaluationOrder) {
+            if (gateLevels.containsKey(gate)) {
+                continue; // Já processado (é um input)
+            }
+            
+            // Encontra o nível máximo dos predecessores
+            int maxLevelAnt = -1;
+            for (Wire wire : wires) {
+                if (wire.getToGate() == gate) {
+                    LogicGate ant = wire.getFromGate();
+                    if (gateLevels.containsKey(ant)) {
+                        maxLevelAnt = Math.max(maxLevelAnt, 
+                                                       gateLevels.get(ant));
+                    }
+                }
+            }
+            // insere par com nivel maxLevelAnt + 1
+            gateLevels.put(gate, maxLevelAnt + 1);
+        }
+        
+        // Encontra o max nivel
+        maxLevel = 0;
+        for (Integer level : gateLevels.values()) {
+            maxLevel = Math.max(maxLevel, level);
+        }
+        
+        // Organiza gates por nivel
+        for (int i = 0; i <= maxLevel; i++) {
+            levels.add(new Array<LogicGate>());
+        }
+        
+        for (LogicGate gate : allGates) {
+            int level = gateLevels.get(gate);
+            levels.get(level).add(gate);
+            
+            // Define nivel e indice do gate
+            gate.setLevel(level);
+            gate.setLevelIdx(levels.get(level).size - 1);
+        }
+    }
+    
+    /**
+     * Atualiza as posições de todos os gates baseado no tamanho da tela.
+     * Recomendado ser chamado ao redimensionar a tela.
+     * 
+     * @param screenWidth Largura da tela em pixels
+     * @param screenHeight Altura da tela em pixels
+     */
+    public void updateAllPos(float screenWidth, float screenHeight) {
+        int totalLevels = maxLevel + 1;
+        
+        // Atualiza cada gate individualmente, nivel a nivel
+        for (int levelIndex = 0; levelIndex <= maxLevel; levelIndex++) {
+            Array<LogicGate> gatesInLevel = levels.get(levelIndex);
+            int gatesCount = gatesInLevel.size;
+            
+            for (LogicGate gate : gatesInLevel) {
+                gate.updatePos(screenWidth, screenHeight, totalLevels, gatesCount);
+            }
+        }
+        
+        // Atualiza os caminhos dos fios
+        for (Wire wire : wires) {
+            wire.calculatePath();
         }
     }
     

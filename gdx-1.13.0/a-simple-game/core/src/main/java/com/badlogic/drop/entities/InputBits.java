@@ -20,6 +20,10 @@ public class InputBits extends LogicGate {
         this.label = label;
         this.value = false;
         this.gateType = "INPUT";
+        
+        // Tamanho do icone PNG 
+        this.width = 108f;
+        this.height = 108f;
     }
 
     /**
@@ -30,6 +34,10 @@ public class InputBits extends LogicGate {
         this.label = label;
         this.value = initialValue;
         this.gateType = "INPUT";
+        
+        // Tamanho específico para inputs (108x108 pixels)
+        this.width = 108f;
+        this.height = 108f;
     }
     
     /**
