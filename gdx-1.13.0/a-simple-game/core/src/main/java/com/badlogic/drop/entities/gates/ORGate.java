@@ -9,12 +9,17 @@ public class ORGate extends LogicGate {
     public ORGate(float x, float y) {
         super(2, x, y); // default 2
         this.gateType = "OR";
+        // Tamanho do icone PNG 
+        this.width = 131f;
+        this.height = 154f;
     }
 
     // construtor para porta OR com varias entradas
     public ORGate(int numInputs, float x, float y) {
         super(numInputs, x, y);
         this.gateType = "OR";
+        this.width = 131f;
+        this.height = 154f;
     }
 
     @Override
