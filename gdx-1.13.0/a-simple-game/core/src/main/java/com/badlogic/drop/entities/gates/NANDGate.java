@@ -1,4 +1,5 @@
 package com.badlogic.drop.entities.gates;
+import com.badlogic.gdx.graphics.Texture;
 
 // porta NAND - a saida é falsa somente se todas as entradas forem verdadeiras, e verdadeiro caso contrário (NOT AND)
 // pode ser construida com mais de duas entradas
@@ -10,9 +11,10 @@ public class NANDGate extends LogicGate {
         super(2, x, y); // default 2 portas
         this.gateType = "NAND";
 
-        // Tamanho do icone PNG 
+        // Tamanho do icone PNG
         this.width = 131f;
         this.height = 154f;
+        this.setTexture(new Texture("gates/NAND_off.png"));
     }
 
     // construtor para porta NAND com varias portas
@@ -21,6 +23,7 @@ public class NANDGate extends LogicGate {
         this.gateType = "NAND";
         this.width = 131f;
         this.height = 154f;
+        this.setTexture(new Texture("gates/NAND_off.png"));
     }
 
     @Override
@@ -29,9 +32,11 @@ public class NANDGate extends LogicGate {
         for (boolean input : inputs) {
             if (!input) {
                 this.output = true;
+                this.setTexture(new Texture("gates/AND_on.png"));
                 return;
             }
         }
+        this.setTexture(new Texture("gates/AND_off.png"));
         this.output = false;
     }
 }

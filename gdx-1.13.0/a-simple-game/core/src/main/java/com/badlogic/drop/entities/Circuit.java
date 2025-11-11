@@ -205,7 +205,7 @@ public class Circuit {
 
         // Atualiza os caminhos dos fios
         for (Wire wire : wires) {
-            wire.calculatePath();
+            wire.updateConnectionPoints();
         }
     }
 

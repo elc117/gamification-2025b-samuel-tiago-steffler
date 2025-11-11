@@ -1,5 +1,6 @@
 package com.badlogic.drop;
 
+import com.badlogic.drop.entities.Wire;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -26,6 +27,10 @@ public class Main implements ApplicationListener {
 
     Vector2 touchPos;
 
+    // Circuit demo
+    private com.badlogic.drop.entities.Circuit circuit;
+    private com.badlogic.drop.ui.WireRenderer wireRenderer;
+
     public Preloader preloader;
 
     @Override
@@ -34,50 +39,66 @@ public class Main implements ApplicationListener {
         viewport = new ScreenViewport(); // Usa pixels 1:1 da tela
         bitState = false;
 
-        // Carrega as texturas
+        // ================ criacao do circuito logico ================
         try {
-            bitOnTexture = new Texture("textures/bits/in_on.png");
-            bitOffTexture = new Texture("textures/bits/in_off.png");
-            oneTexture = new Texture("textures/bits/one.png");
-            zeroTexture = new Texture("textures/bits/zero.png");
-            System.out.println("Texturas carregadas com sucesso!");
+            com.badlogic.drop.entities.CircuitBuilder builder = new com.badlogic.drop.entities.CircuitBuilder();
+
+            builder.addInput("A", 0, 0); // input A
+            builder.addInput("B", 0, 0); // input B
+
+            builder.addXOR(0, 0); // XOR gate
+            builder.addAND(0, 0); // AND gate
+
+            // conecta inputs nas gates
+            builder.connectInput("A", 0, 0); // A -> XOR input 0
+            builder.connectInput("B", 0, 1); // B -> XOR input 1
+
+            builder.connectInput("A", 1, 0); // A -> AND input 0
+            builder.connectInput("B", 1, 1); // B -> AND input 1
+
+            // conecta gates nas outputs
+            builder.addOutput("X", 0, 0, 0); // output X na gate XOR
+            builder.addOutput("Y", 1, 0, 0); // output Y na gate AND
+
+            // criacao dos fios (manual, eh pra criar automaticamente ja)
+            Wire wire1 = new Wire(builder.getInput("A"), builder.getGate(0));
+            Wire wire2 = new Wire(builder.getInput("B"), builder.getGate(0));
+            Wire wire3 = new Wire(builder.getInput("A"), builder.getGate(1));
+            Wire wire4 = new Wire(builder.getInput("B"), builder.getGate(1));
+            Wire wire5 = new Wire(builder.getGate(0), builder.getOutput("X"));
+            Wire wire6 = new Wire(builder.getGate(1), builder.getOutput("Y"));
+            builder.addWire(wire1);
+            builder.addWire(wire2);
+            builder.addWire(wire3);
+            builder.addWire(wire4);
+            builder.addWire(wire5);
+            builder.addWire(wire6);
+
+            // build do circuito
+            circuit = builder.build();
+
+            // Ensure positions and wire endpoints are computed before first frame
+            circuit.updateAllPos(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+            // Create a WireRenderer to draw wires
+            wireRenderer = new com.badlogic.drop.ui.WireRenderer();
+
         } catch (Exception e) {
-            System.out.println("ERRO ao carregar texturas: " + e.getMessage());
-            System.out.println("Verifique se os arquivos estao em: assets/textures/bits/");
+            System.out.println("Erro ao criar circuito: " + e.getMessage());
+            e.printStackTrace();
         }
 
         buttonSize = 150f;
-        updateButtonPosition();
+        //updateButtonPosition();
         touchPos = new Vector2();
-    }
-
-    // centraliza botao na tela
-    private void updateButtonPosition() {
-
-        float screenWidth = Gdx.graphics.getWidth();
-        float screenHeight = Gdx.graphics.getHeight();
-
-        // botao posicionado a esquerda do centro
-        buttonPosition = new Vector2(
-            screenWidth / 2 - buttonSize / 2 - 200,
-            screenHeight / 2 - buttonSize / 2
-        );
-
-        buttonBounds = new Rectangle(
-            buttonPosition.x,
-            buttonPosition.y,
-            buttonSize,
-            buttonSize
-        );
-
-        System.out.println("Botao posicionado em: (" + buttonPosition.x + ", " + buttonPosition.y + ")");
-        System.out.println("Tamanho da tela: " + screenWidth + "x" + screenHeight + " pixels");
     }
 
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
-        updateButtonPosition(); // Reposiciona o botão quando redimensionar a janela
+        if (circuit != null) {
+            circuit.updateAllPos(width, height);
+        }
     }
 
     @Override
@@ -86,19 +107,39 @@ public class Main implements ApplicationListener {
         draw();
     }
 
+
+    /*
+     * Gerencia entrada do usuario (cliques/toques)
+     * Implementacao atual apenas analisa toggle dos bits de entrada do circuito
+     */
     private void handleInput() {
         // Detecta clique/toque
+
         if (Gdx.input.justTouched()) {
             touchPos.set(Gdx.input.getX(), Gdx.input.getY());
+            viewport.unproject(touchPos);
 
-            System.out.println("Clique detectado em: (" + (int)touchPos.x + ", " + (int)touchPos.y + ") pixels");
+            System.out.println("Clique detectado em: (" + (int)touchPos.x + ", " + (int)touchPos.y + ") world pixels");
 
-            // Verifica se clicou no botão
-            if (buttonBounds.contains(touchPos.x, touchPos.y)) {
-                // Alterna o estado do bit
-                bitState = !bitState;
-                System.out.println("Bit alternado - estado: " + (bitState ? "1" : "0"));
+            // verifica se clicou em algum input bit
+            if (circuit != null) {
+                com.badlogic.drop.entities.InputBits[] inputs = circuit.getInputs();
+                for (com.badlogic.drop.entities.InputBits input : inputs) {
+                    float ix = input.getX();
+                    float iy = input.getY();
+                    float iw = input.getWidth();
+                    float ih = input.getHeight();
+
+                    Rectangle r = new Rectangle(ix, iy, iw, ih);
+                    if (r.contains(touchPos.x, touchPos.y)) {
+                        input.toggle();
+                        System.out.println("Input " + input.getLabel() + " -> " + input.getValue());
+                    }
+                }
             }
+
+            // verifica se clicou no menu
+            // (a implementar)
         }
     }
 
@@ -108,41 +149,59 @@ public class Main implements ApplicationListener {
 
         viewport.apply();
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
-        spriteBatch.begin();
+        // Evaluate and draw circuit if present
+        if (circuit != null) {
+            // Evaluate circuit logic
+            circuit.evaluate();
 
-        // Desenha o botao com numero
-        Texture currentButtonTexture = bitState ? oneTexture : zeroTexture;
-        if (currentButtonTexture != null) {
-            spriteBatch.draw(
-                currentButtonTexture,
-                buttonPosition.x,
-                buttonPosition.y,
-                buttonSize,
-                buttonSize
-            );
+            // Draw wires first (so gates are on top)
+            if (wireRenderer != null) {
+                // Ensure shapeRenderer uses same projection
+                wireRenderer.getShapeRenderer().setProjectionMatrix(viewport.getCamera().combined);
+                wireRenderer.renderAll(com.badlogic.gdx.utils.Array.with(circuit.getWires()));
+            }
+
+            // Draw gates/textures
+            spriteBatch.begin();
+            for (com.badlogic.drop.entities.gates.LogicGate gate : circuit.getAllGates()) {
+                if (gate != null) gate.render(spriteBatch);
+            }
+            spriteBatch.end();
+        } else {
+            // fallback: draw the simple button + bit as before
+            spriteBatch.begin();
+
+            Texture currentButtonTexture = bitState ? oneTexture : zeroTexture;
+            if (currentButtonTexture != null) {
+                spriteBatch.draw(
+                    currentButtonTexture,
+                    buttonPosition.x,
+                    buttonPosition.y,
+                    buttonSize,
+                    buttonSize
+                );
+            }
+
+            Texture currentInputTexture = bitState ? bitOnTexture : bitOffTexture;
+            if (currentInputTexture != null) {
+                float screenWidth = Gdx.graphics.getWidth();
+                float screenHeight = Gdx.graphics.getHeight();
+
+                float numberSize = buttonSize;
+                float numberX = screenWidth / 2 - numberSize / 2;
+                float numberY = screenHeight / 2 - numberSize / 2;
+
+                spriteBatch.draw(
+                    currentInputTexture,
+                    numberX,
+                    numberY,
+                    numberSize,
+                    numberSize
+                );
+            }
+
+            spriteBatch.end();
         }
-
-        // Desenha o bit de input
-        Texture currentInputTexture = bitState ? bitOnTexture : bitOffTexture;
-        if (currentInputTexture != null) {
-
-            float screenWidth = Gdx.graphics.getWidth();
-            float screenHeight = Gdx.graphics.getHeight();
-
-            float numberSize = buttonSize;
-            float numberX = screenWidth / 2 - numberSize / 2;
-            float numberY = screenHeight / 2 - numberSize / 2;
-
-            spriteBatch.draw(
-                currentInputTexture,
-                numberX,
-                numberY,
-                numberSize,
-                numberSize
-            );
-        }
-
-        spriteBatch.end();
     }
 
     @Override
@@ -165,5 +224,14 @@ public class Main implements ApplicationListener {
         if (bitOffTexture != null) bitOffTexture.dispose();
         if (oneTexture != null) oneTexture.dispose();
         if (zeroTexture != null) zeroTexture.dispose();
+
+        if (wireRenderer != null) wireRenderer.dispose();
+
+        // Dispose textures owned by gates
+        if (circuit != null) {
+            for (com.badlogic.drop.entities.gates.LogicGate gate : circuit.getAllGates()) {
+                if (gate != null) gate.dispose();
+            }
+        }
     }
 }

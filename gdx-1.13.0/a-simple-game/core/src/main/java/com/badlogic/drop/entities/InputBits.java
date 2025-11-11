@@ -1,6 +1,7 @@
 package com.badlogic.drop.entities;
 
 import com.badlogic.drop.entities.gates.LogicGate;
+import com.badlogic.gdx.graphics.Texture;
 
 /**
  * Representa um nó de entrada do circuito (fonte de sinal).
@@ -8,10 +9,10 @@ import com.badlogic.drop.entities.gates.LogicGate;
  * Funciona como uma "porta" sem entradas que apenas emite um valor controlado pelo usuário.
  */
 public class InputBits extends LogicGate {
-    
+
     private String label; // Ex: "A", "B", "Input 1"
     private boolean value; // Valor atual do input
-    
+
     /**
      * Construtor padrão - cria um input com valor falso
      */
@@ -20,10 +21,11 @@ public class InputBits extends LogicGate {
         this.label = label;
         this.value = false;
         this.gateType = "INPUT";
-        
-        // Tamanho do icone PNG 
+
+        // Tamanho do icone PNG
         this.width = 108f;
         this.height = 108f;
+        this.setTexture(new Texture("textures/bits/in_off.png"));
     }
 
     /**
@@ -34,20 +36,28 @@ public class InputBits extends LogicGate {
         this.label = label;
         this.value = initialValue;
         this.gateType = "INPUT";
-        
-        // Tamanho específico para inputs (108x108 pixels)
         this.width = 108f;
         this.height = 108f;
+        if (initialValue) {
+            this.setTexture(new Texture("textures/bits/in_on.png"));
+        } else {
+            this.setTexture(new Texture("textures/bits/in_off.png"));
+        }
     }
-    
+
     /**
      * InputBits não tem lógica - apenas retorna o valor definido pelo usuário
      */
     @Override
     public void compute() {
         this.output = value;
+        if (value) {
+            this.setTexture(new Texture("textures/bits/in_on.png"));
+        } else {
+            this.setTexture(new Texture("textures/bits/in_off.png"));
+        }
     }
-    
+
     /**
      * Define o valor do input
      */
@@ -55,25 +65,25 @@ public class InputBits extends LogicGate {
         this.value = value;
         this.output = value; // Atualiza output também
     }
-    
+
     /**
      * Obtém o valor atual
      */
     public boolean getValue() {
         return value;
     }
-    
+
     /**
      * Toggle do valor de entrada por meio de interação do usuário
      */
     public void toggle() {
         setValue(!value);
     }
-    
+
     public String getLabel() {
         return label;
     }
-    
+
     public void setLabel(String label) {
         this.label = label;
     }

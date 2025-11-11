@@ -1,4 +1,5 @@
 package com.badlogic.drop.entities.gates;
+import com.badlogic.gdx.graphics.Texture;
 
 // porta XNOR - saida verdadeira se as entradas forem iguais (2 entradas)
 // saida verdadeira se o numero de entradas verdadeiras for par (varias entradas)
@@ -9,9 +10,10 @@ public class XNORGate extends LogicGate {
     public XNORGate(float x, float y) {
         super(2, x, y); // default 2
         this.gateType = "XNOR";
-        // Tamanho do icone PNG 
+        // Tamanho do icone PNG
         this.width = 131f;
         this.height = 154f;
+        this.setTexture(new Texture("gates/XNOR_off.png"));
     }
 
     // construtor para porta XNOR com varias entradas
@@ -20,6 +22,7 @@ public class XNORGate extends LogicGate {
         this.gateType = "XNOR";
         this.width = 131f;
         this.height = 154f;
+        this.setTexture(new Texture("gates/XNOR_off.png"));
     }
 
     @Override
@@ -32,5 +35,10 @@ public class XNORGate extends LogicGate {
             }
         }
         this.output = trueCount % 2 == 0;
+        if(this.output) {
+            this.setTexture(new Texture("gates/XNOR_on.png"));
+        } else {
+            this.setTexture(new Texture("gates/XNOR_off.png"));
+        }
     }
 }

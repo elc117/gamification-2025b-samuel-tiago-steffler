@@ -15,13 +15,13 @@ import com.badlogic.gdx.utils.Array;
  * Permite construir circuitos passo a passo.
  */
 public class CircuitBuilder {
-    
+
     private final Array<InputBits> inputs;
     private final Array<LogicGate> gates;
     private final Array<Wire> wires;
     private final Array<OutputBits> outputs;
     private boolean[] expectedOutput;
-    
+
     // construtor default
     public CircuitBuilder() {
         this.inputs = new Array<>();
@@ -29,7 +29,7 @@ public class CircuitBuilder {
         this.wires = new Array<>();
         this.outputs = new Array<>();
     }
-    
+
     /**
      * Adiciona um input ao circuito
      */
@@ -37,7 +37,7 @@ public class CircuitBuilder {
         inputs.add(new InputBits(label, x, y));
         return this;
     }
-    
+
     /**
      * Adiciona um input com valor inicial
      */
@@ -45,7 +45,7 @@ public class CircuitBuilder {
         inputs.add(new InputBits(label, initialValue, x, y));
         return this;
     }
-    
+
     /**
      * Adiciona uma porta AND
      */
@@ -53,7 +53,7 @@ public class CircuitBuilder {
         gates.add(new ANDGate(x, y));
         return this;
     }
-    
+
     /**
      * Adiciona uma porta OR
      */
@@ -61,7 +61,7 @@ public class CircuitBuilder {
         gates.add(new ORGate(x, y));
         return this;
     }
-    
+
     /**
      * Adiciona uma porta NOT
      */
@@ -69,7 +69,7 @@ public class CircuitBuilder {
         gates.add(new NOTGate(x, y));
         return this;
     }
-    
+
     /**
      * Adiciona uma porta XOR
      */
@@ -77,7 +77,7 @@ public class CircuitBuilder {
         gates.add(new XORGate(x, y));
         return this;
     }
-    
+
     /**
      * Adiciona uma porta NAND
      */
@@ -85,7 +85,7 @@ public class CircuitBuilder {
         gates.add(new NANDGate(x, y));
         return this;
     }
-    
+
     /**
      * Adiciona uma porta NOR
      */
@@ -93,7 +93,7 @@ public class CircuitBuilder {
         gates.add(new NORGate(x, y));
         return this;
     }
-    
+
     /**
      * Adiciona uma porta XNOR
      */
@@ -101,7 +101,7 @@ public class CircuitBuilder {
         gates.add(new XNORGate(x, y));
         return this;
     }
-    
+
     /**
      * Adiciona uma porta genérica
      */
@@ -109,7 +109,12 @@ public class CircuitBuilder {
         gates.add(gate);
         return this;
     }
-    
+
+    public CircuitBuilder addWire(Wire wire) {
+        wires.add(wire);
+        return this;
+    }
+
     /**
      * Conecta duas portas com um fio
      * @param fromIndex Índice da porta de origem
@@ -122,7 +127,7 @@ public class CircuitBuilder {
         wires.add(new Wire(gates.get(fromIndex), gates.get(toIndex)));
         return this;
     }
-    
+
     /**
      * Conecta duas portas especificando os índices de entrada/saída
      * @param fromGateIndex Índice da porta de origem
@@ -130,33 +135,30 @@ public class CircuitBuilder {
      * @param toGateIndex Índice da porta de destino
      * @param toInputIndex Índice da entrada da porta de destino
      */
-    public CircuitBuilder connect(int fromGateIndex, int fromOutputIndex, 
-                                  int toGateIndex, int toInputIndex) {
+    public CircuitBuilder connect(int fromGateIndex, int fromOutputIndex, int toGateIndex, int toInputIndex) {
         if (fromGateIndex >= gates.size || toGateIndex >= gates.size) {
             throw new IllegalArgumentException("GIndice fora dos limites.");
         }
-        wires.add(new Wire(gates.get(fromGateIndex), fromOutputIndex, 
+        wires.add(new Wire(gates.get(fromGateIndex), fromOutputIndex,
                           gates.get(toGateIndex), toInputIndex));
         return this;
     }
-    
+
     /**
      * Conecta um input a uma porta
      * @param inputIndex Índice do input
      * @param gateIndex Índice da porta de destino
      * @param gateInputIndex Índice da entrada da porta de destino
      */
-    public CircuitBuilder connectInput(int inputIndex, int gateIndex, int gateInputIndex) {
-        if (inputIndex >= inputs.size) {
-            throw new IllegalArgumentException("Input index fora dos limites.");
-        }
+    public CircuitBuilder connectInput(String label, int gateIndex, int gateInputIndex) {
+
         if (gateIndex >= gates.size) {
             throw new IllegalArgumentException("Gate index fora dos limites.");
         }
-        wires.add(new Wire(inputs.get(inputIndex), 0, gates.get(gateIndex), gateInputIndex));
+        wires.add(new Wire(this.getInput(label), 0, gates.get(gateIndex), gateInputIndex));
         return this;
     }
-    
+
     /**
      * Adiciona um output ao circuito
      * @param label Rótulo do output
@@ -166,18 +168,18 @@ public class CircuitBuilder {
         if (gateIndex >= gates.size) {
             throw new IllegalArgumentException("Indice fora dos limites.");
         }
-        
-        // Criação de uma saída 
+
+        // Criação de uma saída
         OutputBits output = new OutputBits(label, x, y);
         outputs.add(output);
 
         // Criação de um fio conectando a porta à saída
         Wire wire = new Wire(gates.get(gateIndex), 0, output, 0);
         wires.add(wire);
-        
+
         return this;
     }
-    
+
     /**
      * Define os valores esperados para as saídas
      * @param values Valores esperados (pode ser um valor para cada output ou um array boolean[])
@@ -186,7 +188,7 @@ public class CircuitBuilder {
         this.expectedOutput = values;
         return this;
     }
-    
+
     /**
      * Constrói o circuito final com base nos componentes adicionados.
      * Esse método precisa ser chamado após todas as adições/conexões.
@@ -195,16 +197,16 @@ public class CircuitBuilder {
      */
     public Circuit build() {
         if (inputs.size == 0) {
-            throw new IllegalStateException("Circuito precisa ter uma entrada no mínimo.");
+            throw new IllegalStateException("Circuito precisa ter uma entrada no minimo.");
         }
         if (outputs.size == 0) {
-            throw new IllegalStateException("Circuito precisa ter pelo menos uma saída.");
+            throw new IllegalStateException("Circuito precisa ter pelo menos uma saida.");
         }
         if (expectedOutput == null) {
             // Default: todos false
             expectedOutput = new boolean[outputs.size];
         }
-        
+
         Circuit circuit = new Circuit(
             inputs.toArray(InputBits.class),
             gates.toArray(LogicGate.class),
@@ -212,46 +214,67 @@ public class CircuitBuilder {
             outputs.toArray(OutputBits.class),
             expectedOutput
         );
-        
+
         return circuit;
     }
-    
+
     /**
      * Obtém a última porta adicionada (útil para encadear conexões)
      */
     public int getLastGateIndex() {
         return gates.size - 1;
     }
-    
+
     /**
      * Obtém o número de portas atualmente no circuito
      */
     public int getGateCount() {
         return gates.size;
     }
-    
+
     /**
      * Obtém o número de inputs
      */
     public int getInputCount() {
         return inputs.size;
     }
-    
+
     // Métodos de acesso para configuração manual
-    
+
     public Array<InputBits> getInputs() {
         return inputs;
     }
-    
+
     public Array<LogicGate> getGates() {
         return gates;
     }
-    
-    public InputBits getInput(int index) {
-        return inputs.get(index);
+
+    public InputBits getInput(String label) {
+        for (InputBits input : inputs) {
+            if (input == null) continue;
+            // Assumes InputBits has a getLabel() method
+            if (label == null) {
+                if (input.getLabel() == null) return input;
+            } else if (label.equals(input.getLabel())) {
+                return input;
+            }
+        }
+        throw new IllegalArgumentException("Entrada não encontrada: " + label);
     }
-    
+
     public LogicGate getGate(int index) {
         return gates.get(index);
+    }
+
+    public OutputBits getOutput(String label) {
+        for(OutputBits output : outputs) {
+            if(output == null) continue;
+            if(label == null) {
+                if(output.getLabel() == null) return output;
+            } else if(label.equals(output.getLabel())) {
+                return output;
+            }
+        }
+        throw new IllegalArgumentException("Output não encontrado: " + label);
     }
 }
