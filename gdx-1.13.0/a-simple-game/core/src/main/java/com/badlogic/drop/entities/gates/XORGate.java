@@ -1,4 +1,5 @@
 package com.badlogic.drop.entities.gates;
+import com.badlogic.gdx.graphics.Texture;
 
 // porta XOR - retorna verdadeiro se as entradas tiverem valores distintos (2 entradas)
 // retorna verdadeiro se o numero de entradas verdadeiras for impar (varias entradas)
@@ -9,9 +10,10 @@ public class XORGate extends LogicGate {
     public XORGate(float x, float y) {
         super(2, x, y); // default 2
         this.gateType = "XOR";
-        // Tamanho do icone PNG 
+        // Tamanho do icone PNG
         this.width = 131f;
         this.height = 154f;
+        this.setTexture(new Texture("gates/XOR_off.png"));
     }
 
     // construtor para porta XOR com varias entradas
@@ -20,6 +22,7 @@ public class XORGate extends LogicGate {
         this.gateType = "XOR";
         this.width = 131f;
         this.height = 154f;
+        this.setTexture(new Texture("gates/XOR_off.png"));
     }
 
     @Override
@@ -32,5 +35,10 @@ public class XORGate extends LogicGate {
             }
         }
         this.output = trueCount % 2 == 1;
+        if(this.output) {
+            this.setTexture(new Texture("gates/XOR_on.png"));
+        } else {
+            this.setTexture(new Texture("gates/XOR_off.png"));
+        }
     }
 }

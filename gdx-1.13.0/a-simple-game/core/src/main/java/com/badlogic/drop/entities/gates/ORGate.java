@@ -1,4 +1,5 @@
 package com.badlogic.drop.entities.gates;
+import com.badlogic.gdx.graphics.Texture;
 
 //porta OR - retorna verdadeiro quando qualquer uma das entradas for verdadeira
 // pode ser construida com mais de duas entradas
@@ -9,9 +10,10 @@ public class ORGate extends LogicGate {
     public ORGate(float x, float y) {
         super(2, x, y); // default 2
         this.gateType = "OR";
-        // Tamanho do icone PNG 
+        // Tamanho do icone PNG
         this.width = 131f;
         this.height = 154f;
+        this.setTexture(new Texture("gates/OR_off.png"));
     }
 
     // construtor para porta OR com varias entradas
@@ -20,6 +22,7 @@ public class ORGate extends LogicGate {
         this.gateType = "OR";
         this.width = 131f;
         this.height = 154f;
+        this.setTexture(new Texture("gates/OR_off.png"));
     }
 
     @Override
@@ -28,9 +31,11 @@ public class ORGate extends LogicGate {
         for (boolean input : inputs) {
             if (input) {
                 this.output = true;
+                this.setTexture(new Texture("gates/OR_on.png"));
                 return;
             }
         }
+        this.setTexture(new Texture("gates/OR_off.png"));
         this.output = false;
     }
 }
