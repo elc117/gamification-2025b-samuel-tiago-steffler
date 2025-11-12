@@ -7,23 +7,27 @@ import com.badlogic.gdx.graphics.Texture;
 public class NANDGate extends LogicGate {
 
     // construtor para porta NAND padrao com 2 entradas
-    public NANDGate(float x, float y) {
-        super(2, x, y); // default 2 portas
+    public NANDGate(String label) {
+        super(label, 2); // default 2 portas
         this.gateType = "NAND";
 
         // Tamanho do icone PNG
         this.width = 131f;
         this.height = 154f;
-        this.setTexture(new Texture("gates/NAND_off.png"));
+        this.setTextureOff(new Texture("gates/NAND_off.png"));
+        this.setTextureOn(new Texture("gates/NAND_on.png"));
+        this.setTexture(this.textureOff);
     }
 
     // construtor para porta NAND com varias portas
-    public NANDGate(int numInputs, float x, float y) {
-        super(numInputs, x, y);
+    public NANDGate(String label, int numInputs) {
+        super(label, numInputs);
         this.gateType = "NAND";
         this.width = 131f;
         this.height = 154f;
-        this.setTexture(new Texture("gates/NAND_off.png"));
+        this.setTextureOff(new Texture("gates/NAND_off.png"));
+        this.setTextureOn(new Texture("gates/NAND_on.png"));
+        this.setTexture(this.textureOff);
     }
 
     @Override
@@ -32,11 +36,11 @@ public class NANDGate extends LogicGate {
         for (boolean input : inputs) {
             if (!input) {
                 this.output = true;
-                this.setTexture(new Texture("gates/AND_on.png"));
+                this.setTexture(this.textureOn);
                 return;
             }
         }
-        this.setTexture(new Texture("gates/AND_off.png"));
+        this.setTexture(this.textureOff);
         this.output = false;
     }
 }

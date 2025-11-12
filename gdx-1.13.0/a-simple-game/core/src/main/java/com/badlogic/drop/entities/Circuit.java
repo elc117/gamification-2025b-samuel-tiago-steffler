@@ -7,23 +7,25 @@ import com.badlogic.gdx.utils.ObjectMap;
 // Representa o circuito completo - avaliacao baseada em ordenacao topologica
 public class Circuit {
 
-    private LogicGate[] allGates; // nos do circuito (inputs, gates, outputs)
-    private InputBits[] inputs;
-    private OutputBits[] outputs;
+    private final LogicGate[] allGates; // nos do circuito (inputs, gates, outputs)
+    private final InputBits[] inputs;
+    private final OutputBits[] outputs;
 
-    private Wire[] wires;
+    private final Wire[] wires;
 
     // Saídas esperadas
-    private boolean[] expectedOutput;
+    private final boolean[] expectedOutput;
+
+    private boolean debugMode = false;
 
     // Ordem de avaliacao e atualzacao das portas logicas
-    private Array<LogicGate> evaluationOrder;
+    private final Array<LogicGate> evaluationOrder;
 
     // par de porta e array de portas das quais depende (geralmente 1 ou 2)
-    private ObjectMap<LogicGate, Array<LogicGate>> dependencies;
+    private final ObjectMap<LogicGate, Array<LogicGate>> dependencies;
 
     // organizacao espacial dos gates
-    private Array<Array<LogicGate>> levels; // levels[i] = array dos gates no nivel i
+    private final Array<Array<LogicGate>> levels; // levels[i] = array dos gates no nivel i
     private int maxLevel;
 
     /**
@@ -34,12 +36,12 @@ public class Circuit {
      * @param expectedOutput Valores esperados para as saídas
      */
     public Circuit(InputBits[] inputs, LogicGate[] gates, Wire[] wires,
-                   OutputBits[] outputs, boolean[] expectedOutput) {
+                   OutputBits[] outputs, boolean[] expectedOutput, boolean debugMode) {
         this.inputs = inputs;
         this.outputs = outputs;
         this.wires = wires;
         this.expectedOutput = expectedOutput;
-
+        this.debugMode = debugMode;
         // Combina tudo em um unico array de LogicGates
         this.allGates = new LogicGate[inputs.length + gates.length + outputs.length];
         int index = 0;
@@ -170,7 +172,7 @@ public class Circuit {
 
         // Organiza gates por nivel
         for (int i = 0; i <= maxLevel; i++) {
-            levels.add(new Array<LogicGate>());
+            levels.add(new Array<>());
         }
 
         for (LogicGate gate : allGates) {
@@ -198,11 +200,13 @@ public class Circuit {
             Array<LogicGate> gatesInLevel = levels.get(levelIndex);
             int gatesCount = gatesInLevel.size;
 
+            if (debugMode) {
+                System.out.println("Posicoes atualizadas para tela " + screenWidth + "x" + screenHeight);
+            }
             for (LogicGate gate : gatesInLevel) {
-                gate.updatePos(screenWidth, screenHeight, totalLevels, gatesCount);
+                gate.updatePos(screenWidth, screenHeight, totalLevels, gatesCount, debugMode);
             }
         }
-
         // Atualiza os caminhos dos fios
         for (Wire wire : wires) {
             wire.updateConnectionPoints();
@@ -235,7 +239,8 @@ public class Circuit {
                     gate.setInput(inputIndex, from.getOutput());
                 }
             }
-
+            // avaliar caso em que duas portas estao ligadas no mesmo output
+            // valor que prevalece sera high ou low?
             // Agora calcula o output desta porta
             gate.update();
         }

@@ -7,22 +7,26 @@ import com.badlogic.gdx.graphics.Texture;
 public class XORGate extends LogicGate {
 
     // construtor padrao para a porta XOR 2 entradas
-    public XORGate(float x, float y) {
-        super(2, x, y); // default 2
+    public XORGate(String label) {
+        super(label, 2); // default 2
         this.gateType = "XOR";
         // Tamanho do icone PNG
         this.width = 131f;
         this.height = 154f;
-        this.setTexture(new Texture("gates/XOR_off.png"));
+        this.setTextureOff(new Texture("gates/XOR_off.png"));
+        this.setTextureOn(new Texture("gates/XOR_on.png"));
+        this.setTexture(this.textureOff);
     }
 
     // construtor para porta XOR com varias entradas
-    public XORGate(int numInputs, float x, float y) {
-        super(numInputs, x, y);
+    public XORGate(String label, int numInputs) {
+        super(label, numInputs);
         this.gateType = "XOR";
         this.width = 131f;
         this.height = 154f;
-        this.setTexture(new Texture("gates/XOR_off.png"));
+        this.setTextureOff(new Texture("gates/XOR_off.png"));
+        this.setTextureOn(new Texture("gates/XOR_on.png"));
+        this.setTexture(this.textureOff);
     }
 
     @Override
@@ -36,9 +40,9 @@ public class XORGate extends LogicGate {
         }
         this.output = trueCount % 2 == 1;
         if(this.output) {
-            this.setTexture(new Texture("gates/XOR_on.png"));
+            this.setTexture(this.textureOn);
         } else {
-            this.setTexture(new Texture("gates/XOR_off.png"));
+            this.setTexture(this.textureOff);
         }
     }
 }

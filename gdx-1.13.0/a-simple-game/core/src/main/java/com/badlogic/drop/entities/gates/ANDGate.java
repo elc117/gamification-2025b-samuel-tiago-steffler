@@ -7,24 +7,27 @@ import com.badlogic.gdx.graphics.Texture;
 public class ANDGate extends LogicGate {
 
     // constroi a porta com 2 entradas por default
-    public ANDGate(float x, float y) {
-        super(2, x, y); // default 2
+    public ANDGate(String label) {
+        super(label, 2); // default 2
         this.gateType = "AND";
-
+        this.setTextureOff(new Texture("gates/AND_off.png"));
+        this.setTextureOn(new Texture("gates/AND_on.png"));
         // Tamanho do icone PNG
         this.width = 131f;
         this.height = 154f;
-        this.setTexture(new Texture("gates/AND_off.png"));
+        this.setTexture(this.textureOff);
     }
 
     // constroi a porta com número customizado de entradas
-    public ANDGate(int numInputs, float x, float y) {
-        super(numInputs, x, y);
+    public ANDGate(String label, int numInputs) {
+        super(label, numInputs);
         this.gateType = "AND";
 
         this.width = 131f;
         this.height = 154f;
-        this.setTexture(new Texture("gates/AND_off.png"));
+        this.setTextureOff(new Texture("gates/AND_off.png"));
+        this.setTextureOn(new Texture("gates/AND_on.png"));
+        this.setTexture(this.textureOff);
     }
 
     @Override
@@ -33,11 +36,11 @@ public class ANDGate extends LogicGate {
         for (boolean input : inputs) {
             if (!input) {
                 this.output = false;
-                this.setTexture(new Texture("gates/AND_off.png"));
+                this.setTexture(this.textureOff);
                 return;
             }
         }
-        this.setTexture(new Texture("gates/AND_on.png"));
+        this.setTexture(this.textureOn);
         this.output = true;
     }
 }

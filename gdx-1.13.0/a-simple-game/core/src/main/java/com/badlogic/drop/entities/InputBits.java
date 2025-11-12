@@ -10,14 +10,13 @@ import com.badlogic.gdx.graphics.Texture;
  */
 public class InputBits extends LogicGate {
 
-    private String label; // Ex: "A", "B", "Input 1"
     private boolean value; // Valor atual do input
 
     /**
      * Construtor padrão - cria um input com valor falso
      */
-    public InputBits(String label, float x, float y) {
-        super(0, x, y); // 0 inputs (fonte de sinal)
+    public InputBits(String label) {
+        super(label, 0); // 0 inputs (fonte de sinal)
         this.label = label;
         this.value = false;
         this.gateType = "INPUT";
@@ -25,23 +24,24 @@ public class InputBits extends LogicGate {
         // Tamanho do icone PNG
         this.width = 108f;
         this.height = 108f;
-        this.setTexture(new Texture("textures/bits/in_off.png"));
+        this.setTextureOff(new Texture("textures/bits/in_off.png"));
+        this.setTextureOn(new Texture("textures/bits/in_on.png"));
+        this.setTexture(this.textureOff);
     }
 
     /**
      * Construtor de input com valor predefinido
      */
-    public InputBits(String label, boolean initialValue, float x, float y) {
-        super(0, x, y); // 0 inputs
-        this.label = label;
+    public InputBits(String label, boolean initialValue) {
+        super(label, 0); // 0 inputs
         this.value = initialValue;
         this.gateType = "INPUT";
         this.width = 108f;
         this.height = 108f;
         if (initialValue) {
-            this.setTexture(new Texture("textures/bits/in_on.png"));
+            this.setTexture(this.textureOn);
         } else {
-            this.setTexture(new Texture("textures/bits/in_off.png"));
+            this.setTexture(this.textureOff);
         }
     }
 
@@ -52,9 +52,9 @@ public class InputBits extends LogicGate {
     public void compute() {
         this.output = value;
         if (value) {
-            this.setTexture(new Texture("textures/bits/in_on.png"));
+            this.setTexture(this.textureOn);
         } else {
-            this.setTexture(new Texture("textures/bits/in_off.png"));
+            this.setTexture(this.textureOff);
         }
     }
 
@@ -78,10 +78,6 @@ public class InputBits extends LogicGate {
      */
     public void toggle() {
         setValue(!value);
-    }
-
-    public String getLabel() {
-        return label;
     }
 
     public void setLabel(String label) {

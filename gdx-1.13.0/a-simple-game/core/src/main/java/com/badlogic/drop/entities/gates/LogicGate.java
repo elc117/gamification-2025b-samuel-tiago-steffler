@@ -8,6 +8,8 @@ import com.badlogic.gdx.math.Vector2;
 public abstract class LogicGate {
 
     // Display
+    protected Texture textureOn;
+    protected Texture textureOff;
     protected Texture texture;
     protected Vector2 position;
     protected float width;
@@ -20,6 +22,7 @@ public abstract class LogicGate {
 
     // tipo de porta logica
     protected String gateType;
+    protected String label; // Ex: "A", "B", "Input 1"
     
     // nivel no circuito (0 = inputs, n = outputs) para desenho (circuito sera feito de baixo para cima)
     protected int level;
@@ -31,10 +34,11 @@ public abstract class LogicGate {
     // numInputs - numero de entradas da porta logica
     // x - posição X na tela
     // y - posição Y na tela
-    public LogicGate(int numInputs, float x, float y) {
+    public LogicGate(String label, int numInputs) {
+        this.label = label;
         this.numInputs = numInputs;
         this.inputs = new boolean[numInputs];
-        this.position = new Vector2(x, y);
+        this.position = new Vector2(0, 0);
         this.output = false;
 
         // dimensoes padrao
@@ -56,22 +60,23 @@ public abstract class LogicGate {
      * @param gateLevel Número de gates neste nível
      */
     public void updatePos(float screenWidth, float screenHeight, 
-                               int levelTot, int gateLevel) {
+                               int levelTot, int gateLevel, boolean debugMode) {
 
 
 
         // ------------------ Margens - modificar se preciso ------------------
-        float bottom = 100f;    // Espaço na parte inferior
-        float top = 100f;       // Espaço no topo
-        float sides = 100f;     // Espaço nas laterais
+        float bottom = 150f;    // Espaço na parte inferior
+        float top = 150f;       // Espaço no topo
+        float sides = 200f;     // Espaço nas laterais
         
 
 
         // Altura util do circuito
+        // vou descontar a altura do output ja que a renderizacao comeca no canto inferior esquerdo
         float aUtil = screenHeight - bottom - top;
         
         // Calcula Y baseado no nivel (0 = bottom, totalLevels - 1 = top)
-        float espac = levelTot > 1 ? aUtil / (levelTot - 1) : 0;
+        float espac = levelTot > 1 ? (aUtil) / (levelTot - 1) : 0;
         float y = bottom + (level * espac);
         
         // Largura util para distribuir gates horizontalmente
@@ -87,7 +92,10 @@ public abstract class LogicGate {
             float spacing = lUtil / (gateLevel - 1);
             x = sides + (levelIdx * spacing) - width / 2;
         }
-        
+        if (debugMode) {
+            System.out.println("Gate " + gateType + " nivel " + level + " indice " + levelIdx + 
+                               " posicao atualizada para (" + x + ", " + y + ")");
+        }
         this.position.set(x, y);
     }
 
@@ -102,8 +110,20 @@ public abstract class LogicGate {
     }
 
     // Getters e Setters
-    public Texture getTexture() {
-        return texture;
+    public Texture getTextureOn() {
+        return textureOn;
+    }
+
+    public Texture getTextureOff() {
+        return textureOff;
+    }
+
+    public void setTextureOn(Texture texture) {
+        this.textureOn = texture;
+    }
+
+    public void setTextureOff(Texture texture) {
+        this.textureOff = texture;
     }
 
     public void setTexture(Texture texture) {
@@ -191,9 +211,13 @@ public abstract class LogicGate {
     public void setLevelIdx(int levelIdx) {
         this.levelIdx = levelIdx;
     }
+    
+    public String getLabel() {
+        return label;
+    }
 
 
-    // Renderiza a porta logica na tela
+    // Renderiza a porta logica na tela baseado no valor
     // - batch: SpriteBatch usado para desenhar a textura
     public void render(SpriteBatch batch) {
         if (texture != null) {
@@ -202,6 +226,12 @@ public abstract class LogicGate {
     }
 
     public void dispose() {
+        if (textureOn != null) {
+            textureOn.dispose();
+        }
+        if (textureOff != null) {
+            textureOff.dispose();
+        }
         if (texture != null) {
             texture.dispose();
         }

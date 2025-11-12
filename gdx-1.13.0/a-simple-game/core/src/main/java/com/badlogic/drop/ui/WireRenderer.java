@@ -10,8 +10,8 @@ import com.badlogic.gdx.utils.Array;
 // Usa ShapeRenderer do libGDX para desenhar linhas conectando os pontos do caminho
 public class WireRenderer {
 
-    private ShapeRenderer shapeRenderer;
-    private boolean ownsRenderer; // se este renderer criou o ShapeRenderer
+    private final ShapeRenderer shapeRenderer;
+    private final boolean ownsRenderer; // se este renderer criou o ShapeRenderer
 
     // Cria um WireRenderer com seu proprio ShapeRenderer
     public WireRenderer() {
@@ -78,14 +78,6 @@ public class WireRenderer {
         float length = (float) Math.sqrt(dx * dx + dy * dy);
 
         if (length == 0) return;
-
-        // Normaliza o vetor direcao
-        float dirX = dx / length;
-        float dirY = dy / length;
-
-        // Vetor perpendicular (para a espessura)
-        float perpX = -dirY * thickness / 2;
-        float perpY = dirX * thickness / 2;
 
         // Desenha retangulo representando a linha
         shapeRenderer.rect(x1, y1, 0, 0, length, thickness, 1, 1,

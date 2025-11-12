@@ -5,5 +5,22 @@
   <source path="" />
   <!-- Reflection includes may be needed for your code or library code. Each value is separated by periods ('.'). -->
   <!-- You can include a full package by not including the name of a type at the end. -->
+  
+  <!-- Register circuit-related classes for GWT reflection -->
+  <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.drop.entities.InputBits" />
+  <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.drop.entities.OutputBits" />
+  <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.drop.entities.Circuit" />
+  <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.drop.entities.CircuitBuilder" />
+  <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.drop.entities.Wire" />
+  
+  <!-- Register all gate classes for GWT reflection -->
+  <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.drop.entities.gates.LogicGate" />
+  <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.drop.entities.gates.ANDGate" />
+  <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.drop.entities.gates.ORGate" />
+  <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.drop.entities.gates.NOTGate" />
+  <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.drop.entities.gates.NANDGate" />
+  <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.drop.entities.gates.NORGate" />
+  <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.drop.entities.gates.XORGate" />
+  <extend-configuration-property name="gdx.reflect.include" value="com.badlogic.drop.entities.gates.XNORGate" />
 
 </module>
