@@ -7,23 +7,27 @@ import com.badlogic.gdx.graphics.Texture;
 public class NORGate extends LogicGate {
 
     // construtor para porta NOR padrao com 2 entradas
-    public NORGate(float x, float y) {
-        super(2, x, y); // default 2
+    public NORGate(String label) {
+        super(label, 2); // default 2
         this.gateType = "NOR";
 
         // Tamanho do icone PNG
         this.width = 131f;
         this.height = 154f;
-        this.setTexture(new Texture("gates/NOR_off.png"));
+        this.setTextureOff(new Texture("gates/NOR_off.png"));
+        this.setTextureOn(new Texture("gates/NOR_on.png"));
+        this.setTexture(this.textureOff);
     }
 
     // construtor para porta NOR com varias entradas
-    public NORGate(int numInputs, float x, float y) {
-        super(numInputs, x, y);
+    public NORGate(String label, int numInputs) {
+        super(label, numInputs);
         this.gateType = "NOR";
         this.width = 131f;
         this.height = 154f;
-        this.setTexture(new Texture("gates/NOR_off.png"));
+        this.setTextureOff(new Texture("gates/NOR_off.png"));
+        this.setTextureOn(new Texture("gates/NOR_on.png"));
+        this.setTexture(this.textureOff);
     }
 
     @Override
@@ -32,11 +36,11 @@ public class NORGate extends LogicGate {
         for (boolean input : inputs) {
             if (input) {
                 this.output = false;
-                this.setTexture(new Texture("gates/NOR_off.png"));
+                this.setTexture(this.textureOff);
                 return;
             }
         }
-        this.setTexture(new Texture("gates/NOR_on.png"));
+        this.setTexture(this.textureOn);
         this.output = true;
     }
 }

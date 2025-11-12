@@ -9,21 +9,19 @@ import com.badlogic.gdx.graphics.Texture;
  * Funciona como uma "porta" passthrough que apenas propaga seu input único.
  */
 public class OutputBits extends LogicGate {
-
-    private String label; // Ex: "Output", "Result", "Sum"
-
     /**
      * Construtor - cria um output com 1 entrada
      */
-    public OutputBits(String label, float x, float y) {
-        super(1, x, y); // 1 input (recebe sinal de outra porta)
-        this.label = label;
+    public OutputBits(String label) {
+        super(label, 1); // 1 input (recebe sinal de outra porta)
         this.gateType = "OUTPUT";
 
         // Tamanho do icone PNG
         this.width = 83f;
         this.height = 83f;
-        this.setTexture(new Texture("textures/bits/out_off.png"));
+        this.setTextureOff(new Texture("textures/bits/out_off.png"));
+        this.setTextureOn(new Texture("textures/bits/out_on.png"));
+        this.setTexture(this.textureOff);
     }
 
     /**
@@ -34,9 +32,9 @@ public class OutputBits extends LogicGate {
         // Propaga o primeiro (e único) input para o output
         this.output = inputs.length > 0 ? inputs[0] : false;
         if (this.output) {
-            this.setTexture(new Texture("textures/bits/out_on.png"));
+            this.setTexture(this.textureOn);
         } else {
-            this.setTexture(new Texture("textures/bits/out_off.png"));
+            this.setTexture(this.textureOff);
         }
     }
 
@@ -45,10 +43,6 @@ public class OutputBits extends LogicGate {
      */
     public boolean getValue() {
         return getOutput();
-    }
-
-    public String getLabel() {
-        return label;
     }
 
     public void setLabel(String label) {

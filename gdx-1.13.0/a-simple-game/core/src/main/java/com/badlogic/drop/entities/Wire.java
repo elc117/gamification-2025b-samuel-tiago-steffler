@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 //classe que armazena as conexões entre portas lógicas
-public class Wire {
+public final class Wire {
 
     protected boolean state;        // estado do fio (true/false)
     protected LogicGate fromGate;   // porta de origem
@@ -22,10 +22,11 @@ public class Wire {
     protected Array<Vector2> pathPoints;
     
     // Comprimento do segmento reto ao sair/entrar nas portas
-    protected float seglen = 30f;
+    // 30 pixels serao usados para ficar "dentro" das portas
+    protected float seglen = 60f;
 
     // Espessura da linha do fio
-    protected float lineWidth = 4f;
+    protected float lineWidth = 8f;
     
     // Cores para diferentes estados
     protected Color activeColor;    // cor quando true
@@ -69,17 +70,17 @@ public class Wire {
      */
     public void updateConnectionPoints() {
         // Por enquanto, usa o centro das portas
-        // TODO: ajustar para usar posições exatas dos pinos de entrada/saída (libGSX renderiza a partir do canto superior esquerdo)
+        // TODO: ajustar para usar posições exatas dos pinos de entrada/saída (libGSX renderiza a partir do canto inferior esquerdo)
 
         // saida: coordenada X no meio da porta de origem (gate.X + width / 2)
-        //        coordenada Y baseada da porta de origem - altura (gate.Y + height)
+        //        coordenada Y baseada da porta de origem - altura (gate.Y + height) - 30 para ficar "dentro"
         this.fromX = fromGate.getX() + fromGate.getWidth() / 2;
-        this.fromY = fromGate.getY();
+        this.fromY = fromGate.getY() + fromGate.getHeight() - 30;
 
-        // entrada: coordenada X baseada na entrada da porta de destino (gate.X + (width / numInputs) * inputIndex)
-        //          coordenada Y na base da porta de destino (gate.Y - altura da imagem)
-        this.toX = toGate.getX() + (toGate.getWidth() / toGate.getNumInputs()) * this.toInputIndex; // entrada por baixo (circuito vertical)
-        this.toY = toGate.getY() - fromGate.getHeight();
+        // entrada: coordenada X baseada na entrada da porta de destino (gate.X + (width / numInputs) * (inputIndex + 0.5)) para centralizar
+        //          coordenada Y na base da porta de destino (gate.Y) + 30 para ficar "dentro"
+        this.toX = toGate.getX() + (toGate.getWidth() / toGate.getNumInputs()) * (this.toInputIndex + 0.5f); // entrada por baixo (circuito vertical)
+        this.toY = toGate.getY() + 30;
         
         // Recalcula o caminho
         calculatePath();
@@ -87,9 +88,9 @@ public class Wire {
     
     /**
      * Calcula os pontos do caminho do fio:
-     * 1. Sai reto (horizontal) da porta de origem
+     * 1. Sai reto (vertical) da porta de origem
      * 2. Segmento diagonal ou vertical se necessário
-     * 3. Entra reto (horizontal) na porta de destino
+     * 3. Entra reto (vertical) na porta de destino
      */
     protected void calculatePath() {
         pathPoints.clear();
@@ -97,19 +98,19 @@ public class Wire {
         // Ponto inicial (saída da porta de origem)
         pathPoints.add(new Vector2(fromX, fromY));
         
-        // Ponto após segmento reto inicial (saindo para a direita)
-        float midX1 = fromX + seglen;
-        pathPoints.add(new Vector2(midX1, fromY));
+        // Ponto após segmento reto inicial (saindo para cima)
+        float midY1 = fromY + seglen;
+        pathPoints.add(new Vector2(fromX, midY1));
         
-        // Ponto antes do segmento reto final (entrando pela esquerda)
-        float midX2 = toX - seglen;
-        pathPoints.add(new Vector2(midX2, toY));
+        // Ponto antes do segmento reto final (entrando por baixo)
+        float midY2 = toY - seglen;
+        pathPoints.add(new Vector2(toX, midY2));
         
         // Ponto final (entrada da porta de destino)
         pathPoints.add(new Vector2(toX, toY));
         
         // Se os segmentos retos se sobrepõem, simplifica o caminho
-        if (midX1 >= midX2) {
+        if (midY1 >= midY2) {
             pathPoints.clear();
             float midX = (fromX + toX) / 2;
             pathPoints.add(new Vector2(fromX, fromY));

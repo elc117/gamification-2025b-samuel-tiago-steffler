@@ -6,13 +6,15 @@ import com.badlogic.gdx.graphics.Texture;
 public class NOTGate extends LogicGate {
 
     // construtor para porta NOT com 1 entrada
-    public NOTGate(float x, float y) {
-        super(1, x, y); // maximo 1 entrada
+    public NOTGate(String label) {
+        super(label, 1); // maximo 1 entrada
         this.gateType = "NOT";
         // Tamanho do icone PNG
         this.width = 131f;
         this.height = 154f;
-        this.setTexture(new Texture("gates/NOT_off.png"));
+        this.setTextureOff(new Texture("gates/NOT_off.png"));
+        this.setTextureOn(new Texture("gates/NOT_on.png"));
+        this.setTexture(this.textureOff);
     }
 
     @Override
@@ -20,9 +22,9 @@ public class NOTGate extends LogicGate {
         // Retorna o inverso da unica entrada
         this.output = !inputs[0];
         if (this.output) {
-            this.setTexture(new Texture("gates/NOT_on.png"));
+            this.setTexture(this.textureOn);
         } else {
-            this.setTexture(new Texture("gates/NOT_off.png"));
+            this.setTexture(this.textureOff);
         }
     }
 }

@@ -33,72 +33,72 @@ public class CircuitBuilder {
     /**
      * Adiciona um input ao circuito
      */
-    public CircuitBuilder addInput(String label, float x, float y) {
-        inputs.add(new InputBits(label, x, y));
+    public CircuitBuilder addInput(String label) {
+        inputs.add(new InputBits(label));
         return this;
     }
 
     /**
      * Adiciona um input com valor inicial
      */
-    public CircuitBuilder addInput(String label, boolean initialValue, float x, float y) {
-        inputs.add(new InputBits(label, initialValue, x, y));
+    public CircuitBuilder addInput(String label, boolean initialValue) {
+        inputs.add(new InputBits(label, initialValue));
         return this;
     }
 
     /**
      * Adiciona uma porta AND
      */
-    public CircuitBuilder addAND(float x, float y) {
-        gates.add(new ANDGate(x, y));
+    public CircuitBuilder addAND(String label) {
+        gates.add(new ANDGate(label));
         return this;
     }
 
     /**
      * Adiciona uma porta OR
      */
-    public CircuitBuilder addOR(float x, float y) {
-        gates.add(new ORGate(x, y));
+    public CircuitBuilder addOR(String label) {
+        gates.add(new ORGate(label));
         return this;
     }
 
     /**
      * Adiciona uma porta NOT
      */
-    public CircuitBuilder addNOT(float x, float y) {
-        gates.add(new NOTGate(x, y));
+    public CircuitBuilder addNOT(String label) {
+        gates.add(new NOTGate(label));
         return this;
     }
 
     /**
      * Adiciona uma porta XOR
      */
-    public CircuitBuilder addXOR(float x, float y) {
-        gates.add(new XORGate(x, y));
+    public CircuitBuilder addXOR(String label) {
+        gates.add(new XORGate(label));
         return this;
     }
 
     /**
      * Adiciona uma porta NAND
      */
-    public CircuitBuilder addNAND(float x, float y) {
-        gates.add(new NANDGate(x, y));
+    public CircuitBuilder addNAND(String label) {
+        gates.add(new NANDGate(label));
         return this;
     }
 
     /**
      * Adiciona uma porta NOR
      */
-    public CircuitBuilder addNOR(float x, float y) {
-        gates.add(new NORGate(x, y));
+    public CircuitBuilder addNOR(String label) {
+        gates.add(new NORGate(label));
         return this;
     }
 
     /**
      * Adiciona uma porta XNOR
      */
-    public CircuitBuilder addXNOR(float x, float y) {
-        gates.add(new XNORGate(x, y));
+    public CircuitBuilder addXNOR(String label) {
+        gates.add(new XNORGate(label));
         return this;
     }
 
@@ -150,12 +150,19 @@ public class CircuitBuilder {
      * @param gateIndex Índice da porta de destino
      * @param gateInputIndex Índice da entrada da porta de destino
      */
-    public CircuitBuilder connectInput(String label, int gateIndex, int gateInputIndex) {
-
-        if (gateIndex >= gates.size) {
-            throw new IllegalArgumentException("Gate index fora dos limites.");
+    public CircuitBuilder connectInput(String from, String to, int gateInputIndex) {
+        if (getGate(to) == null) {
+            throw new IllegalArgumentException("Gate nao encontrado.");
         }
-        wires.add(new Wire(this.getInput(label), 0, gates.get(gateIndex), gateInputIndex));
+
+        // Att. agora n precisa mais criar inputs, eles sao criados automaticamente com outputs se nao existem
+        InputBits input = getInput(from);
+        if (input == null) {
+            input = new InputBits(from);
+            inputs.add(input);
+        }
+
+        wires.add(new Wire(input, 0, getGate(to), gateInputIndex));
         return this;
     }
 
@@ -164,17 +171,22 @@ public class CircuitBuilder {
      * @param label Rótulo do output
      * @param gateIndex Índice da porta de onde o output é retirado
      */
-    public CircuitBuilder addOutput(String label, int gateIndex, float x, float y) {
-        if (gateIndex >= gates.size) {
-            throw new IllegalArgumentException("Indice fora dos limites.");
+    public CircuitBuilder addOutput(String label, String gateLabel, float x, float y) {
+        if (getGate(gateLabel) == null) {
+            throw new IllegalArgumentException("Gate nao encontrado.");
         }
 
-        // Criação de uma saída
-        OutputBits output = new OutputBits(label, x, y);
-        outputs.add(output);
+        // Criação de uma saída se nao existir
+        // pode acontecer de mais umm gat ligar no mesmo output
+        // (estado sera atualizado pelo ultimo gate modificado ou ultimo wire processado)
+        OutputBits output = getOutput(label);
+        if (output == null) {
+            output = new OutputBits(label);
+            outputs.add(output);
+        }
 
         // Criação de um fio conectando a porta à saída
-        Wire wire = new Wire(gates.get(gateIndex), 0, output, 0);
+        Wire wire = new Wire(getGate(gateLabel), 0, output, 0);
         wires.add(wire);
 
         return this;
@@ -194,8 +206,13 @@ public class CircuitBuilder {
      * Esse método precisa ser chamado após todas as adições/conexões.
      * Para conectar inputs a portas, use o método connectInput().
      * Portas a portas usam connect(), e conexões de portas a saídas são criadas automaticamente em addOutput().
+     * Incluir true como argumento para emitir mensagens de debug (posicionamento)
      */
     public Circuit build() {
+        return build(false);
+    }
+
+    public Circuit build(boolean debug) {
         if (inputs.size == 0) {
             throw new IllegalStateException("Circuito precisa ter uma entrada no minimo.");
         }
@@ -212,7 +229,8 @@ public class CircuitBuilder {
             gates.toArray(LogicGate.class),
             wires.toArray(Wire.class),
             outputs.toArray(OutputBits.class),
-            expectedOutput
+            expectedOutput,
+            debug
         );
 
         return circuit;
@@ -259,7 +277,21 @@ public class CircuitBuilder {
                 return input;
             }
         }
-        throw new IllegalArgumentException("Entrada não encontrada: " + label);
+        //throw new IllegalArgumentException("Entrada não encontrada: " + label);
+        return null;
+    }
+
+    public LogicGate getGate(String label) {
+        for (LogicGate gate : gates) {
+            if (gate == null) continue;
+            if (label == null) {
+                if (gate.getLabel() == null) return gate;
+            } else if (label.equals(gate.getLabel())) {
+                return gate;
+            }
+        }
+        //throw new IllegalArgumentException("Gate não encontrado: " + label);
+        return null;
     }
 
     public LogicGate getGate(int index) {
@@ -275,6 +307,11 @@ public class CircuitBuilder {
                 return output;
             }
         }
-        throw new IllegalArgumentException("Output não encontrado: " + label);
+        //throw new IllegalArgumentException("Output não encontrado: " + label);
+        return null;
+    }
+
+    public Array<Wire> getWires() {
+        return this.wires;
     }
 }

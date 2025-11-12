@@ -7,22 +7,26 @@ import com.badlogic.gdx.graphics.Texture;
 public class ORGate extends LogicGate {
 
     // construtor padrão da porta OR
-    public ORGate(float x, float y) {
-        super(2, x, y); // default 2
+    public ORGate(String label){
+        super(label, 2); // default 2
         this.gateType = "OR";
         // Tamanho do icone PNG
         this.width = 131f;
         this.height = 154f;
-        this.setTexture(new Texture("gates/OR_off.png"));
+        this.setTextureOff(new Texture("gates/OR_off.png"));
+        this.setTextureOn(new Texture("gates/OR_on.png"));
+        this.setTexture(this.textureOff);
     }
 
     // construtor para porta OR com varias entradas
-    public ORGate(int numInputs, float x, float y) {
-        super(numInputs, x, y);
+    public ORGate(String label, int numInputs) {
+        super(label, numInputs);
         this.gateType = "OR";
         this.width = 131f;
         this.height = 154f;
-        this.setTexture(new Texture("gates/OR_off.png"));
+        this.setTextureOff(new Texture("gates/OR_off.png"));
+        this.setTextureOn(new Texture("gates/OR_on.png"));
+        this.setTexture(this.textureOff);
     }
 
     @Override
@@ -31,11 +35,11 @@ public class ORGate extends LogicGate {
         for (boolean input : inputs) {
             if (input) {
                 this.output = true;
-                this.setTexture(new Texture("gates/OR_on.png"));
+                this.setTexture(this.textureOn);
                 return;
             }
         }
-        this.setTexture(new Texture("gates/OR_off.png"));
+        this.setTexture(this.textureOff);
         this.output = false;
     }
 }

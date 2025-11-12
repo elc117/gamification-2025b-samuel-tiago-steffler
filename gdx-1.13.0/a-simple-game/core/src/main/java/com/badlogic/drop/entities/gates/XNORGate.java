@@ -7,22 +7,26 @@ import com.badlogic.gdx.graphics.Texture;
 public class XNORGate extends LogicGate {
 
     // construtor padrao para a porta XNOR 2 entradas
-    public XNORGate(float x, float y) {
-        super(2, x, y); // default 2
+    public XNORGate(String label) {
+        super(label, 2); // default 2
         this.gateType = "XNOR";
         // Tamanho do icone PNG
         this.width = 131f;
         this.height = 154f;
-        this.setTexture(new Texture("gates/XNOR_off.png"));
+        this.setTextureOff(new Texture("gates/XNOR_off.png"));
+        this.setTextureOn(new Texture("gates/XNOR_on.png"));
+        this.setTexture(this.textureOff);
     }
 
     // construtor para porta XNOR com varias entradas
-    public XNORGate(int numInputs, float x, float y) {
-        super(numInputs, x, y);
+    public XNORGate(String label, int numInputs) {
+        super(label, numInputs);
         this.gateType = "XNOR";
         this.width = 131f;
         this.height = 154f;
-        this.setTexture(new Texture("gates/XNOR_off.png"));
+        this.setTextureOff(new Texture("gates/XNOR_off.png"));
+        this.setTextureOn(new Texture("gates/XNOR_on.png"));
+        this.setTexture(this.textureOff);
     }
 
     @Override
@@ -36,9 +40,9 @@ public class XNORGate extends LogicGate {
         }
         this.output = trueCount % 2 == 0;
         if(this.output) {
-            this.setTexture(new Texture("gates/XNOR_on.png"));
+            this.setTexture(this.textureOn);
         } else {
-            this.setTexture(new Texture("gates/XNOR_off.png"));
+            this.setTexture(this.textureOff);
         }
     }
 }

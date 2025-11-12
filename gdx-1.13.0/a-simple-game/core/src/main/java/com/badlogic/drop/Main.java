@@ -1,9 +1,7 @@
 package com.badlogic.drop;
 
-import com.badlogic.drop.entities.Wire;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -13,17 +11,6 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 public class Main implements ApplicationListener {
     SpriteBatch spriteBatch;
     ScreenViewport viewport;
-
-    Texture bitOnTexture;
-    Texture bitOffTexture;
-    Texture oneTexture;
-    Texture zeroTexture;
-
-    boolean bitState;
-
-    Rectangle buttonBounds;
-    Vector2 buttonPosition;
-    float buttonSize;
 
     Vector2 touchPos;
 
@@ -37,59 +24,88 @@ public class Main implements ApplicationListener {
     public void create() {
         spriteBatch = new SpriteBatch();
         viewport = new ScreenViewport(); // Usa pixels 1:1 da tela
-        bitState = false;
+
+        // Set log level to DEBUG to ensure all messages appear in browser console
+        Gdx.app.setLogLevel(com.badlogic.gdx.Application.LOG_DEBUG);
+        Gdx.app.log("Main", "=== APPLICATION STARTED ===");
+        Gdx.app.log("Main", "App type: " + Gdx.app.getType());
 
         // ================ criacao do circuito logico ================
         try {
+            Gdx.app.log("Main.create", "Starting circuit creation...");
             com.badlogic.drop.entities.CircuitBuilder builder = new com.badlogic.drop.entities.CircuitBuilder();
+            Gdx.app.log("Main.create", "CircuitBuilder created successfully");
 
-            builder.addInput("A", 0, 0); // input A
-            builder.addInput("B", 0, 0); // input B
+            //builder.addInput("A"); // input A
+            //builder.addInput("B"); // input B
+            //builder.addInput("C"); // input C
+            Gdx.app.log("Main.create", "Adding gates...");
 
-            builder.addXOR(0, 0); // XOR gate
-            builder.addAND(0, 0); // AND gate
+            builder.addXOR("XOR1"); // XOR gate
+            builder.addAND("AND1"); // AND gate
+            builder.addOR("OR1"); // OR gate
+            builder.addNOT("NOT1"); // NOT gate
+            builder.addNAND("NAND1"); // NAND gate
+            builder.addNOR("NOR1"); // NOR gate
+            builder.addXNOR("XNOR1"); // XNOR gate
+            Gdx.app.log("Main.create", "All gates added successfully");
 
             // conecta inputs nas gates
-            builder.connectInput("A", 0, 0); // A -> XOR input 0
-            builder.connectInput("B", 0, 1); // B -> XOR input 1
-
-            builder.connectInput("A", 1, 0); // A -> AND input 0
-            builder.connectInput("B", 1, 1); // B -> AND input 1
+            Gdx.app.log("Main.create", "Connecting inputs to gates...");
+            builder.connectInput("A", "XOR1", 0); // A -> XOR input 0
+            builder.connectInput("B", "XOR1", 1); // B -> XOR input 1
+            builder.connectInput("A", "AND1", 0); // A -> AND input 0
+            builder.connectInput("B", "AND1", 1); // B -> AND input 1
+            builder.connectInput("A", "OR1", 0); // A -> OR input 0
+            builder.connectInput("B", "OR1", 1); // B -> OR input 1
+            builder.connectInput("C", "NOT1", 0); // C -> NOT input 0
+            builder.connectInput("A", "NAND1", 0); // A -> NAND input 0
+            builder.connectInput("B", "NAND1", 1); // B -> NAND input 1
+            builder.connectInput("A", "NOR1", 0); // A -> NOR input 0
+            builder.connectInput("B", "NOR1", 1); // B -> NOR input 1
+            builder.connectInput("A", "XNOR1", 0); // A -> XNOR input 0
+            builder.connectInput("B", "XNOR1", 1); // B -> XNOR input 1
+            Gdx.app.log("Main.create", "All inputs connected successfully");
 
             // conecta gates nas outputs
-            builder.addOutput("X", 0, 0, 0); // output X na gate XOR
-            builder.addOutput("Y", 1, 0, 0); // output Y na gate AND
-
-            // criacao dos fios (manual, eh pra criar automaticamente ja)
-            Wire wire1 = new Wire(builder.getInput("A"), builder.getGate(0));
-            Wire wire2 = new Wire(builder.getInput("B"), builder.getGate(0));
-            Wire wire3 = new Wire(builder.getInput("A"), builder.getGate(1));
-            Wire wire4 = new Wire(builder.getInput("B"), builder.getGate(1));
-            Wire wire5 = new Wire(builder.getGate(0), builder.getOutput("X"));
-            Wire wire6 = new Wire(builder.getGate(1), builder.getOutput("Y"));
-            builder.addWire(wire1);
-            builder.addWire(wire2);
-            builder.addWire(wire3);
-            builder.addWire(wire4);
-            builder.addWire(wire5);
-            builder.addWire(wire6);
+            Gdx.app.log("Main.create", "Adding outputs...");
+            builder.addOutput("X0", "XOR1", 0, 0); // output X0 na gate XOR
+            builder.addOutput("X1", "AND1", 0, 0); // output X1 na gate AND
+            builder.addOutput("X2", "OR1", 0, 0); // output X2 na gate OR
+            builder.addOutput("X3", "NOT1", 0, 0); // output X3 na gate NOT
+            builder.addOutput("X4", "NAND1", 0, 0); // output X4 na gate NAND
+            builder.addOutput("X5", "NOR1", 0, 0); // output X5 na gate NOR
+            builder.addOutput("X6", "XNOR1", 0, 0); // output X6 na gate XNOR
+            Gdx.app.log("Main.create", "All outputs added successfully");
 
             // build do circuito
-            circuit = builder.build();
+            Gdx.app.log("Main.create", "Building circuit...");
+            circuit = builder.build(true);
+            Gdx.app.log("Main.create", "Circuit built successfully!");
 
             // Ensure positions and wire endpoints are computed before first frame
+            Gdx.app.log("Main.create", "Computing positions for screen: " + Gdx.graphics.getWidth() + "x" + Gdx.graphics.getHeight());
             circuit.updateAllPos(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            Gdx.app.log("Main.create", "Positions updated");
 
             // Create a WireRenderer to draw wires
+            Gdx.app.log("Main.create", "Creating WireRenderer...");
             wireRenderer = new com.badlogic.drop.ui.WireRenderer();
+            wireRenderer.renderAll(builder.getWires());
+            Gdx.app.log("Main.create", "Circuit creation complete!");
 
         } catch (Exception e) {
-            System.out.println("Erro ao criar circuito: " + e.getMessage());
-            e.printStackTrace();
+            Gdx.app.error("Main.create", "========================================");
+            Gdx.app.error("Main.create", "ERROR: Failed to create circuit!");
+            Gdx.app.error("Main.create", "Exception type: " + e.getClass().getName());
+            Gdx.app.error("Main.create", "Message: " + e.getMessage());
+            Gdx.app.error("Main.create", "========================================");
+            Gdx.app.error("Main.create", "Stack trace:", e);
+            // Set circuit to null so debug screen appears
+            circuit = null;
+            wireRenderer = null;
         }
 
-        buttonSize = 150f;
-        //updateButtonPosition();
         touchPos = new Vector2();
     }
 
@@ -168,38 +184,42 @@ public class Main implements ApplicationListener {
             }
             spriteBatch.end();
         } else {
-            // fallback: draw the simple button + bit as before
+            // fallback: nao desenha nada de circuito
             spriteBatch.begin();
 
-            Texture currentButtonTexture = bitState ? oneTexture : zeroTexture;
-            if (currentButtonTexture != null) {
-                spriteBatch.draw(
-                    currentButtonTexture,
-                    buttonPosition.x,
-                    buttonPosition.y,
-                    buttonSize,
-                    buttonSize
-                );
-            }
+            // quadrado dummy
+            spriteBatch.setColor(1, 1, 1, 1);
+            com.badlogic.gdx.graphics.Pixmap pixmap = new com.badlogic.gdx.graphics.Pixmap(1, 1, com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888);
+            pixmap.setColor(com.badlogic.gdx.graphics.Color.WHITE);
+            pixmap.fill();
+            com.badlogic.gdx.graphics.Texture texture = new com.badlogic.gdx.graphics.Texture(pixmap);
+            pixmap.dispose();
 
-            Texture currentInputTexture = bitState ? bitOnTexture : bitOffTexture;
-            if (currentInputTexture != null) {
-                float screenWidth = Gdx.graphics.getWidth();
-                float screenHeight = Gdx.graphics.getHeight();
+            //texto dummy
+            com.badlogic.gdx.graphics.g2d.BitmapFont font = new com.badlogic.gdx.graphics.g2d.BitmapFont();
+            font.setColor(com.badlogic.gdx.graphics.Color.RED);
+            font.getData().setScale(1.5f);
+            
+            String errorMsg = "Circuit creation failed!";
+            String checkMsg = "Check browser console (F12) for errors";
+            String appTypeMsg = "App type: " + Gdx.app.getType();
+            
+            font.draw(spriteBatch, errorMsg, 
+                Gdx.graphics.getWidth() / 2f - 100, 
+                Gdx.graphics.getHeight() / 2f);
+            font.draw(spriteBatch, checkMsg, 
+                Gdx.graphics.getWidth() / 2f - 150, 
+                Gdx.graphics.getHeight() / 2f - 30);
+            font.draw(spriteBatch, appTypeMsg, 
+                Gdx.graphics.getWidth() / 2f - 100, 
+                Gdx.graphics.getHeight() / 2f - 60);
 
-                float numberSize = buttonSize;
-                float numberX = screenWidth / 2 - numberSize / 2;
-                float numberY = screenHeight / 2 - numberSize / 2;
-
-                spriteBatch.draw(
-                    currentInputTexture,
-                    numberX,
-                    numberY,
-                    numberSize,
-                    numberSize
-                );
-            }
-
+            spriteBatch.draw(texture, 
+                Gdx.graphics.getWidth() / 2f - 50, 
+                Gdx.graphics.getHeight() / 2f - 50, 
+                100, 100);
+            
+            texture.dispose();
             spriteBatch.end();
         }
     }
@@ -220,11 +240,6 @@ public class Main implements ApplicationListener {
     public void dispose() {
         // Libera recursos
         if (spriteBatch != null) spriteBatch.dispose();
-        if (bitOnTexture != null) bitOnTexture.dispose();
-        if (bitOffTexture != null) bitOffTexture.dispose();
-        if (oneTexture != null) oneTexture.dispose();
-        if (zeroTexture != null) zeroTexture.dispose();
-
         if (wireRenderer != null) wireRenderer.dispose();
 
         // Dispose textures owned by gates
