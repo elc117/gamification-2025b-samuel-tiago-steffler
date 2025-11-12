@@ -1,0 +1,39 @@
+{
+    "levels": [
+        {
+            "id": 1,
+            "inputs": [
+                {
+                    "label": "I0"
+                },
+                {
+                    "label": "I1"
+                }
+            ],
+            "gates": [
+                {
+                    "label": "0",
+                    "type": "OR",
+                    "inputs": { "0": "I0", "1": "I1" }
+                },
+                {
+                    "label": "1",
+                    "type": "NOT",
+                    "inputs": { "0": "0" }
+                },
+                {
+                    "label": "2",
+                    "type": "AND",
+                    "inputs": { "0": "1", "1": "I1" }
+                }
+
+            ],
+            "outputs": [
+                {
+                    "label": "X0",
+                    "input": "2"
+                }
+            ]
+        }
+    ]
+}
