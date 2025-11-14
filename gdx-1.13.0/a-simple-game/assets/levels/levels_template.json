@@ -33,7 +33,11 @@
                     "label": "X0",
                     "input": "2"
                 }
-            ]
+            ],
+            "solution": {
+                "I0": false,
+                "I1": true
+            }
         }
     ]
 }

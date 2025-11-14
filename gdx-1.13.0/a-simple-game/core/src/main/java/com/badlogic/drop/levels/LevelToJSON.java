@@ -55,6 +55,17 @@ public class LevelToJSON {
     }
 
     /*
+     * Estrutura da solucao (valores esperados das saidas)
+     */
+    private static class Solution {
+        public ObjectMap<String, Boolean> values;
+
+        public Solution(ObjectMap<String, Boolean> values) {
+            this.values = values;
+        }
+    }
+
+    /*
      * Estrutura do nivel completo
      */
     private static class Level {
@@ -62,12 +73,14 @@ public class LevelToJSON {
         public List<Input> inputs;
         public List<Gate> gates;
         public List<Output> outputs;
+        public Solution solution;
 
-        public Level(int id, List<Input> inputs, List<Gate> gates, List<Output> outputs) {
+        public Level(int id, List<Input> inputs, List<Gate> gates, List<Output> outputs, Solution solution) {
             this.id = id;
             this.inputs = inputs;
             this.gates = gates;
             this.outputs = outputs;
+            this.solution = solution;
         }
     }
 
@@ -139,8 +152,13 @@ public class LevelToJSON {
             allInputs = new TreeSet<>();
             gates = new ArrayList<>();
 
+            // Separa circuitos da solucao usando "-"
+            String[] lineParts = line.split("-");
+            String circuitsPart = lineParts[0].trim();
+            String solutionPart = lineParts.length > 1 ? lineParts[1].trim() : "";
+
             // Tokenizacao por ponto e virgula (separa circuitos/saidas)
-            String[] circuits = line.split(";");
+            String[] circuits = circuitsPart.split(";");
 
             List<String> outputGateLabels = new ArrayList<>();
 
@@ -163,7 +181,10 @@ public class LevelToJSON {
                 outputs.add(new Output("X" + i, outputGateLabels.get(i)));
             }
 
-            levels.add(new Level(levelId++, inputs, new ArrayList<>(gates), outputs));
+            // Cria a solucao
+            Solution solution = parseSolution(solutionPart, outputs.size());
+
+            levels.add(new Level(levelId++, inputs, new ArrayList<>(gates), outputs, solution));
         }
 
         return levels;
@@ -217,6 +238,28 @@ public class LevelToJSON {
         expressionToGateLabel.put(expr, gateLabel);
 
         return gateLabel;
+    }
+
+    /**
+     * Faz o parsing da solucao (valores esperados das saidas)
+     * Formato: "1,0,1" significa X0=true, X1=false, X2=true
+     */
+    private Solution parseSolution(String solutionString, int numOutputs) {
+        ObjectMap<String, Boolean> values = new ObjectMap<>();
+
+        if (solutionString.isEmpty()) {
+            // Se nao ha solucao, retorna null
+            return null;
+        }
+
+        String[] parts = solutionString.split(",");
+        for (int i = 0; i < parts.length && i < numOutputs; i++) {
+            String value = parts[i].trim();
+            boolean boolValue = value.equals("1");
+            values.put("X" + i, boolValue);
+        }
+
+        return new Solution(values);
     }
 
     /**
