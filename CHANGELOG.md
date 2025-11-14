@@ -31,6 +31,36 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - Mecânicas de jogo planejadas
 - Especificação de tecnologias utilizadas
 
+
+## [0.2.0] - 2025-11-11
+
+### Adicionado
+
+- Criação de todas as classes lógicas básicas do jogo
+- Implementação inicial para teste de portas lógicas e evaluação de expressões
+- Criação de texturas e do esqueleto inicial do jogo
+- Renderização básica do circuito com as texturas criadas
+
+
+## [0.3.0] - 2025-11-12
+
+### Adicionado
+
+- Criação de um parser simples para interpretar expressões lógicas expressas em texto para JSON
+- Criação de níveis do jogo no arquivo ``levels.txt ``
+
+### Modificado
+
+- Refatoração do sistema de renderização de todo o circuito
+- Novo modelo de criação de entradas e saídas das portas lógicas
+- Configuração do Gradle para adicionar task de conversão de níveis
+- Recompilação do GWT para build HTML funcionar corretamente
+
+### Documentação
+
+- Atualização do CHANGELOG.md com novas versões e mudanças realizadas
+- Atualização no instructions.md com instruções para construção dos níveis
+
 ---
 
 <!--
@@ -57,3 +87,5 @@ links:
 
 [Unreleased]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v0.1.0
+[0.2.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v0.2.0
+[0.3.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v0.3.0

@@ -50,6 +50,12 @@ A simple game from the libGDX wiki tutorials.
       .\gradlew.bat lwjgl3:run
       ```
 
+   7. Para construir os niveis (levels.txt -> levels.json)
+   
+      ```
+      ./gradlew :core:convertLevels  
+      ```
+
 # Para versionamento
 
 ## 1. commit das mudanças
