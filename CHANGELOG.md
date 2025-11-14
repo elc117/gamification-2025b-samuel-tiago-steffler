@@ -61,6 +61,23 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - Atualização do CHANGELOG.md com novas versões e mudanças realizadas
 - Atualização no instructions.md com instruções para construção dos níveis
 
+
+## [0.4.0] - 2025-11-13
+
+### Adicionado
+
+- Criação do parser de JSON para circuito lógico do nível
+- Novos sprites do jogo na pasta ``assets/textures/UI``
+
+### Modificado
+
+- Refatoração do sistema de renderização dos fios para obedecer a nova orientação (fios horizontais e verticais)
+- Refatoração de métodos das classes Circuit e CircuitBuilder
+
+### Documentação
+
+- Atualização do CHANGELOG.md com as mudanças realizadas
+
 ---
 
 <!--
@@ -89,3 +106,4 @@ links:
 [0.1.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v0.1.0
 [0.2.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v0.2.0
 [0.3.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v0.3.0
+[0.4.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v0.4.0
