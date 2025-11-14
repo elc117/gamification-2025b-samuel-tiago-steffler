@@ -87,10 +87,12 @@ public final class Wire {
     }
     
     /**
-     * Calcula os pontos do caminho do fio:
-     * 1. Sai reto (vertical) da porta de origem
-     * 2. Segmento diagonal ou vertical se necessário
-     * 3. Entra reto (vertical) na porta de destino
+     * Calcula os pontos do caminho do fio usando apenas linhas horizontais e verticais:
+     * 1. Sai verticalmente da porta de origem
+     * 2. Dobra horizontalmente (altura determinada pelo elemento com Y menor, 
+     *    distanciando-se proporcionalmente à sua posição X)
+     * 3. Dobra verticalmente em direção à porta de destino
+     * 4. Entra verticalmente na porta de destino
      */
     protected void calculatePath() {
         pathPoints.clear();
@@ -98,26 +100,39 @@ public final class Wire {
         // Ponto inicial (saída da porta de origem)
         pathPoints.add(new Vector2(fromX, fromY));
         
-        // Ponto após segmento reto inicial (saindo para cima)
-        float midY1 = fromY + seglen;
-        pathPoints.add(new Vector2(fromX, midY1));
+        // Determina qual elemento tem o Y menor (mais superior na tela)
+        float referenceY;
+        float referenceX;
+
+        if (fromY < toY) {
+            // Origem está mais superior
+            referenceY = fromY;
+            referenceX = fromX;
+        } else {
+            // Destino está mais superior (ou igual)
+            referenceY = toY;
+            referenceX = toX;
+        }
         
-        // Ponto antes do segmento reto final (entrando por baixo)
-        float midY2 = toY - seglen;
-        pathPoints.add(new Vector2(toX, midY2));
+        // Altura do fio horizontal: parte do elemento mais superior
+        // e soma proporcionalmente à sua posição X
+        // Fórmula: Yfio = Yref + distanciaBase + (Xref * fator)
+        float baseDistance = 50f;
+        float xFactor = 0.07f;
+        float horizontalY = referenceY + baseDistance + (referenceX * xFactor);
+        
+        // Ponto após sair verticalmente da origem
+        pathPoints.add(new Vector2(fromX, horizontalY));
+        
+        // Ponto antes de descer verticalmente para o destino (mesma altura, mas X do destino)
+        pathPoints.add(new Vector2(toX, horizontalY));
+        
+        // Ponto antes de entrar na porta de destino (segmento reto final)
+        float entryY = toY - seglen;
+        pathPoints.add(new Vector2(toX, entryY));
         
         // Ponto final (entrada da porta de destino)
         pathPoints.add(new Vector2(toX, toY));
-        
-        // Se os segmentos retos se sobrepõem, simplifica o caminho
-        if (midY1 >= midY2) {
-            pathPoints.clear();
-            float midX = (fromX + toX) / 2;
-            pathPoints.add(new Vector2(fromX, fromY));
-            pathPoints.add(new Vector2(midX, fromY));
-            pathPoints.add(new Vector2(midX, toY));
-            pathPoints.add(new Vector2(toX, toY));
-        }
     }
     
     /**
@@ -160,7 +175,7 @@ public final class Wire {
     }
     
     public float getLineWidth() {
-        return lineWidth;
+       return lineWidth;
     }
     
     public void setLineWidth(float lineWidth) {
@@ -199,3 +214,24 @@ public final class Wire {
         this.inactiveColor = color;
     }
 }
+
+
+/*
+
+
+   O0   01     
+    |___|____
+        |   |
+        |   |
+       ... ...
+
+ ...    ...  ...
+  |      |    |
+(AND)  (NOT) (OR)
+ |  |    |___|__|    
+ |  |_____   |  |
+ |_______|___|  |
+ |       |      |
+I0      I1     I2
+
+*/

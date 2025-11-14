@@ -1,12 +1,17 @@
 package com.badlogic.drop;
 
+import com.badlogic.drop.entities.InputBits;
+import com.badlogic.drop.levels.JSONtoCircuit;
+import com.badlogic.drop.levels.Level;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
 
 public class Main implements ApplicationListener {
     SpriteBatch spriteBatch;
@@ -32,7 +37,16 @@ public class Main implements ApplicationListener {
 
         // ================ criacao do circuito logico ================
         try {
-            Gdx.app.log("Main.create", "Starting circuit creation...");
+            Gdx.app.log("Main.create", "Buscando niveis em assets/levels/levels.json...");
+            Array<Level> levels;
+            levels = new JSONtoCircuit().convert(Gdx.files.internal("levels/levels.json"));
+            Gdx.app.log("Main.create", "Niveis carregados: " + levels.size);
+            if (levels.size > 0) {
+                Level level1 = levels.get(5);
+                circuit = level1.getCircuit();
+            }
+            Gdx.app.log("Main.create", "Circuito carregado.");
+            /*Gdx.app.log("Main.create", "Starting circuit creation...");
             com.badlogic.drop.entities.CircuitBuilder builder = new com.badlogic.drop.entities.CircuitBuilder();
             Gdx.app.log("Main.create", "CircuitBuilder created successfully");
 
@@ -69,20 +83,20 @@ public class Main implements ApplicationListener {
 
             // conecta gates nas outputs
             Gdx.app.log("Main.create", "Adding outputs...");
-            builder.addOutput("X0", "XOR1", 0, 0); // output X0 na gate XOR
-            builder.addOutput("X1", "AND1", 0, 0); // output X1 na gate AND
-            builder.addOutput("X2", "OR1", 0, 0); // output X2 na gate OR
-            builder.addOutput("X3", "NOT1", 0, 0); // output X3 na gate NOT
-            builder.addOutput("X4", "NAND1", 0, 0); // output X4 na gate NAND
-            builder.addOutput("X5", "NOR1", 0, 0); // output X5 na gate NOR
-            builder.addOutput("X6", "XNOR1", 0, 0); // output X6 na gate XNOR
+            builder.addOutput("X0", "XOR1"); // output X0 na gate XOR
+            builder.addOutput("X1", "AND1"); // output X1 na gate AND
+            builder.addOutput("X2", "OR1"); // output X2 na gate OR
+            builder.addOutput("X3", "NOT1"); // output X3 na gate NOT
+            builder.addOutput("X4", "NAND1"); // output X4 na gate NAND
+            builder.addOutput("X5", "NOR1"); // output X5 na gate NOR
+            builder.addOutput("X6", "XNOR1"); // output X6 na gate XNOR
             Gdx.app.log("Main.create", "All outputs added successfully");
 
             // build do circuito
             Gdx.app.log("Main.create", "Building circuit...");
             circuit = builder.build(true);
             Gdx.app.log("Main.create", "Circuit built successfully!");
-
+            */
             // Ensure positions and wire endpoints are computed before first frame
             Gdx.app.log("Main.create", "Computing positions for screen: " + Gdx.graphics.getWidth() + "x" + Gdx.graphics.getHeight());
             circuit.updateAllPos(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -91,9 +105,9 @@ public class Main implements ApplicationListener {
             // Create a WireRenderer to draw wires
             Gdx.app.log("Main.create", "Creating WireRenderer...");
             wireRenderer = new com.badlogic.drop.ui.WireRenderer();
-            wireRenderer.renderAll(builder.getWires());
+            wireRenderer.renderAll(circuit.getWires());
             Gdx.app.log("Main.create", "Circuit creation complete!");
-
+            
         } catch (Exception e) {
             Gdx.app.error("Main.create", "========================================");
             Gdx.app.error("Main.create", "ERROR: Failed to create circuit!");
@@ -139,7 +153,7 @@ public class Main implements ApplicationListener {
 
             // verifica se clicou em algum input bit
             if (circuit != null) {
-                com.badlogic.drop.entities.InputBits[] inputs = circuit.getInputs();
+                Array<InputBits> inputs = circuit.getInputs();
                 for (com.badlogic.drop.entities.InputBits input : inputs) {
                     float ix = input.getX();
                     float iy = input.getY();
@@ -165,19 +179,19 @@ public class Main implements ApplicationListener {
 
         viewport.apply();
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
-        // Evaluate and draw circuit if present
+        // se circuito estiver presente
         if (circuit != null) {
-            // Evaluate circuit logic
+            // primeiramente calcula todos os valores do circuito
             circuit.evaluate();
 
-            // Draw wires first (so gates are on top)
+            // primeiro fios
             if (wireRenderer != null) {
                 // Ensure shapeRenderer uses same projection
                 wireRenderer.getShapeRenderer().setProjectionMatrix(viewport.getCamera().combined);
-                wireRenderer.renderAll(com.badlogic.gdx.utils.Array.with(circuit.getWires()));
+                wireRenderer.renderAll(circuit.getWires());
             }
 
-            // Draw gates/textures
+            // dai os gates
             spriteBatch.begin();
             for (com.badlogic.drop.entities.gates.LogicGate gate : circuit.getAllGates()) {
                 if (gate != null) gate.render(spriteBatch);

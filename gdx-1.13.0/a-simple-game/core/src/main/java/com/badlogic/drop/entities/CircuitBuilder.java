@@ -20,7 +20,7 @@ public class CircuitBuilder {
     private final Array<LogicGate> gates;
     private final Array<Wire> wires;
     private final Array<OutputBits> outputs;
-    private boolean[] expectedOutput;
+    private Array<Boolean> expectedOutput;
 
     // construtor default
     public CircuitBuilder() {
@@ -43,6 +43,14 @@ public class CircuitBuilder {
      */
     public CircuitBuilder addInput(String label, boolean initialValue) {
         inputs.add(new InputBits(label, initialValue));
+        return this;
+    }
+
+    /**
+     * Adiciona um output ao circuito
+     */
+    public CircuitBuilder addOutput(String label) {
+        outputs.add(new OutputBits(label));
         return this;
     }
 
@@ -167,11 +175,57 @@ public class CircuitBuilder {
     }
 
     /**
+     * Conecta dois componentes (InputBits ou LogicGate) pelo label
+     * Detecta automaticamente se "from" é um InputBits ou LogicGate
+     * @param from Label do componente de origem (InputBits ou LogicGate)
+     * @param to Label da porta de destino (LogicGate)
+     * @param toInputIndex Índice da entrada da porta de destino
+     */
+    public CircuitBuilder connect(String from, String to, int toInputIndex) {
+        return connect(from, 0, to, toInputIndex);
+    }
+
+    /**
+     * Conecta dois componentes (InputBits ou LogicGate) pelo label com índices customizados
+     * Detecta automaticamente se "from" é um InputBits ou LogicGate
+     * @param from Label do componente de origem (InputBits ou LogicGate)
+     * @param fromOutputIndex Índice da saída do componente de origem
+     * @param to Label da porta de destino (LogicGate)
+     * @param toInputIndex Índice da entrada da porta de destino
+     */
+    public CircuitBuilder connect(String from, int fromOutputIndex, String to, int toInputIndex) {
+        LogicGate toGate = getGate(to);
+        if (toGate == null) {
+            throw new IllegalArgumentException("Gate de destino nao encontrado: " + to);
+        }
+
+        // Primeiro tenta encontrar como LogicGate
+        LogicGate fromGate = getGate(from);
+        if (fromGate != null) {
+            wires.add(new Wire(fromGate, fromOutputIndex, toGate, toInputIndex));
+            return this;
+        }
+
+        // Se não encontrou como gate, tenta como InputBits
+        InputBits fromInput = getInput(from);
+        if (fromInput != null) {
+            wires.add(new Wire(fromInput, fromOutputIndex, toGate, toInputIndex));
+            return this;
+        }
+
+        // Se não encontrou nem como gate nem como input, cria um input automaticamente
+        fromInput = new InputBits(from);
+        inputs.add(fromInput);
+        wires.add(new Wire(fromInput, fromOutputIndex, toGate, toInputIndex));
+        return this;
+    }
+
+    /**
      * Adiciona um output ao circuito
      * @param label Rótulo do output
      * @param gateIndex Índice da porta de onde o output é retirado
      */
-    public CircuitBuilder addOutput(String label, String gateLabel, float x, float y) {
+    public CircuitBuilder addOutput(String label, String gateLabel) {
         if (getGate(gateLabel) == null) {
             throw new IllegalArgumentException("Gate nao encontrado.");
         }
@@ -188,7 +242,6 @@ public class CircuitBuilder {
         // Criação de um fio conectando a porta à saída
         Wire wire = new Wire(getGate(gateLabel), 0, output, 0);
         wires.add(wire);
-
         return this;
     }
 
@@ -197,7 +250,10 @@ public class CircuitBuilder {
      * @param values Valores esperados (pode ser um valor para cada output ou um array boolean[])
      */
     public CircuitBuilder expectOutputs(boolean... values) {
-        this.expectedOutput = values;
+        this.expectedOutput = new Array<>();
+        for (boolean value : values) {
+            this.expectedOutput.add(value);
+        }
         return this;
     }
 
@@ -221,17 +277,10 @@ public class CircuitBuilder {
         }
         if (expectedOutput == null) {
             // Default: todos false
-            expectedOutput = new boolean[outputs.size];
+            expectedOutput = new Array<>(outputs.size);
         }
 
-        Circuit circuit = new Circuit(
-            inputs.toArray(InputBits.class),
-            gates.toArray(LogicGate.class),
-            wires.toArray(Wire.class),
-            outputs.toArray(OutputBits.class),
-            expectedOutput,
-            debug
-        );
+        Circuit circuit = new Circuit(inputs, gates, wires, outputs, expectedOutput, debug);
 
         return circuit;
     }
