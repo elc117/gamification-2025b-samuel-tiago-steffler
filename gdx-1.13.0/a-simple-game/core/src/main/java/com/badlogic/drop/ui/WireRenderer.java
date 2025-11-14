@@ -79,8 +79,15 @@ public class WireRenderer {
 
         if (length == 0) return;
 
+        // Ajusta Y para linhas que vão da direita para a esquerda (dx negativo)
+        // para compensar o deslocamento causado pela rotação
+        float adjustedY1 = y1;
+        if (dx < 0) {
+            adjustedY1 += thickness;
+        }
+
         // Desenha retangulo representando a linha
-        shapeRenderer.rect(x1, y1, 0, 0, length, thickness, 1, 1,
+        shapeRenderer.rect(x1, adjustedY1, 0, 0, length, thickness, 1, 1,
                           (float) Math.toDegrees(Math.atan2(dy, dx)));
     }
 

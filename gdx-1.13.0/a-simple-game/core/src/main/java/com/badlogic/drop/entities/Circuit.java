@@ -7,14 +7,14 @@ import com.badlogic.gdx.utils.ObjectMap;
 // Representa o circuito completo - avaliacao baseada em ordenacao topologica
 public class Circuit {
 
-    private final LogicGate[] allGates; // nos do circuito (inputs, gates, outputs)
-    private final InputBits[] inputs;
-    private final OutputBits[] outputs;
+    private final Array<LogicGate> allGates; // nos do circuito (inputs, gates, outputs)
+    private final Array<InputBits> inputs;
+    private final Array<OutputBits> outputs;
 
-    private final Wire[] wires;
+    private final Array<Wire> wires;
 
     // Saídas esperadas
-    private final boolean[] expectedOutput;
+    private final Array<Boolean> expectedOutput;
 
     private boolean debugMode = false;
 
@@ -35,24 +35,23 @@ public class Circuit {
      * @param outputs Nós de saída (herdam de LogicGate)
      * @param expectedOutput Valores esperados para as saídas
      */
-    public Circuit(InputBits[] inputs, LogicGate[] gates, Wire[] wires,
-                   OutputBits[] outputs, boolean[] expectedOutput, boolean debugMode) {
+    public Circuit(Array<InputBits> inputs, Array<LogicGate> gates, Array<Wire> wires,
+                   Array<OutputBits> outputs, Array<Boolean> expectedOutput, boolean debugMode) {
         this.inputs = inputs;
         this.outputs = outputs;
         this.wires = wires;
         this.expectedOutput = expectedOutput;
         this.debugMode = debugMode;
         // Combina tudo em um unico array de LogicGates
-        this.allGates = new LogicGate[inputs.length + gates.length + outputs.length];
-        int index = 0;
+        this.allGates = new Array<>(inputs.size + gates.size + outputs.size);
         for (InputBits input : inputs) {
-            allGates[index++] = input;
+            allGates.add(input);
         }
         for (LogicGate gate : gates) {
-            allGates[index++] = gate;
+            allGates.add(gate);
         }
         for (OutputBits output : outputs) {
-            allGates[index++] = output;
+            allGates.add(output);
         }
 
         this.dependencies = new ObjectMap<>();
@@ -123,7 +122,7 @@ public class Circuit {
         }
 
         // Verifica se ha ciclos
-        if (evaluationOrder.size != allGates.length) {
+        if (evaluationOrder.size != allGates.size) {
             throw new IllegalStateException("Circuito contém laços (estilo latches)! Reevaluar expressão.");
         }
     }
@@ -217,12 +216,12 @@ public class Circuit {
      * Define os valores das entradas do circuito
      */
     public void setInputValues(boolean[] inputValues) {
-        if (inputValues.length != inputs.length) {
+        if (inputValues.length != inputs.size) {
             throw new IllegalArgumentException("Contagem de valores de entrada nao corresponde ao numero de entradas.");
         }
 
-        for (int i = 0; i < inputs.length; i++) {
-            inputs[i].setValue(inputValues[i]);
+        for (int i = 0; i < inputs.size; i++) {
+            inputs.get(i).setValue(inputValues[i]);
         }
     }
 
@@ -255,12 +254,12 @@ public class Circuit {
     // verifica se o circuito esta correto (outputs == expectedOutputs)
 
     public boolean isCorrect() {
-        if (outputs.length != expectedOutput.length) {
+        if (outputs.size != expectedOutput.size) {
             return false;
         }
 
-        for (int i = 0; i < outputs.length; i++) {
-            if (outputs[i].getValue() != expectedOutput[i]) {
+        for (int i = 0; i < outputs.size; i++) {
+            if (outputs.get(i).getValue() != expectedOutput.get(i)) {
                 return false;
             }
         }
@@ -269,33 +268,42 @@ public class Circuit {
 
 
     // obtem os valores atuais das saidas
-    public boolean[] getActualOutputs() {
-        boolean[] result = new boolean[outputs.length];
-        for (int i = 0; i < outputs.length; i++) {
-            result[i] = outputs[i].getValue();
+    public Array<Boolean> getActualOutputs() {
+        Array<Boolean> result = new Array<>(outputs.size);
+        for (int i = 0; i < outputs.size; i++) {
+            result.add(outputs.get(i).getValue());
         }
         return result;
     }
 
     // Getters
-    public InputBits[] getInputs() {
+    public Array<InputBits> getInputs() {
         return inputs;
     }
 
-    public LogicGate[] getAllGates() {
+    public Array<LogicGate> getAllGates() {
         return allGates;
     }
 
-    public Wire[] getWires() {
+    public Array<Wire> getWires() {
         return wires;
     }
 
-    public OutputBits[] getOutputs() {
+    public Array<OutputBits> getOutputs() {
         return outputs;
     }
 
-    public boolean[] getExpectedOutput() {
+    public Array<Boolean> getExpectedOutput() {
         return expectedOutput;
+    }
+
+    public void setExpectedOutput(String outputLabel, boolean value) {
+        for(int i = 0; i < outputs.size; i++) {
+            if (outputs.get(i).getLabel().equals(outputLabel)) {
+                expectedOutput.set(i, value);
+                return;
+            }
+        }
     }
 
     public Array<LogicGate> getEvaluationOrder() {
