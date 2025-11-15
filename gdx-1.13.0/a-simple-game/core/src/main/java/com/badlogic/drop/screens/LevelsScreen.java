@@ -1,6 +1,6 @@
 package com.badlogic.drop.screens;
 
-import com.badlogic.drop.DropGame;
+import com.badlogic.drop.BitItGame;
 import com.badlogic.drop.levels.LevelManager;
 import com.badlogic.drop.levels.LevelProgress;
 import com.badlogic.drop.ui.LevelButton;
@@ -19,10 +19,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 /**
- * Tela de seleção de níveis com matriz 3x2 e paginação
+ * Tela de selecao de niveis com matriz 3x2 e paginacao
  */
 public class LevelsScreen implements Screen {
-    private final DropGame game;
+    private final BitItGame game;
     private Stage stage;
     private Texture backgroundTexture;
     private Image backgroundImage;
@@ -30,13 +30,13 @@ public class LevelsScreen implements Screen {
     private Texture buttonDownTexture;
     private Texture buttonBackTexture;
 
-    // Gerenciamento de níveis
+    // Gerenciamento de niveis
     private LevelManager levelManager;
     private LevelProgress levelProgress;
     private Array<LevelButton> levelButtons;
     private Table levelsTable;
 
-    // Paginação
+    // Paginas
     private static final int LEVELS_PER_PAGE = 6; // 3x2
     private static final int ROWS = 3;
     private static final int COLS = 2;
@@ -46,7 +46,7 @@ public class LevelsScreen implements Screen {
     private ImageButton upButton;
     private ImageButton downButton;
 
-    public LevelsScreen(final DropGame game) {
+    public LevelsScreen(final BitItGame game) {
         this.game = game;
 
         // Inicializa gerenciadores
@@ -54,11 +54,11 @@ public class LevelsScreen implements Screen {
         levelProgress = LevelProgress.getInstance();
         levelButtons = new Array<>();
 
-        // Calcula total de páginas
+        // Calcula total de paginas
         int totalLevels = levelManager.getTotalLevels();
         totalPages = (int) Math.ceil((float) totalLevels / LEVELS_PER_PAGE);
 
-        Gdx.app.log("LevelsScreen", "Total de níveis: " + totalLevels + ", Páginas: " + totalPages);
+        Gdx.app.log("LevelsScreen", "Total de niveis: " + totalLevels + ", Paginas: " + totalPages);
 
         // Carrega texturas
         try {
@@ -76,26 +76,26 @@ public class LevelsScreen implements Screen {
             throw e;
         }
 
-        stage = new Stage(new FitViewport(DropGame.VIRTUAL_WIDTH, DropGame.VIRTUAL_HEIGHT));
+        stage = new Stage(new FitViewport(BitItGame.VIRTUAL_WIDTH, BitItGame.VIRTUAL_HEIGHT));
         backgroundImage = new Image(backgroundTexture);
         backgroundImage.setFillParent(true);
         stage.addActor(backgroundImage);
 
-        // Cria tabela para os botões de níveis
+        // Cria tabela para os botoes de niveis
         levelsTable = new Table();
-        levelsTable.setPosition(DropGame.VIRTUAL_WIDTH / 2, DropGame.VIRTUAL_HEIGHT / 2);
+        levelsTable.setFillParent(true); // Preenche a tela toda
         stage.addActor(levelsTable);
 
         float scale = 0.5f;
 
-        // Configura botao de up (página anterior)
+        // Configura botao de up
         ImageButton.ImageButtonStyle upButtonStyle = new ImageButton.ImageButtonStyle();
         upButtonStyle.imageUp = new TextureRegionDrawable(buttonUpTexture);
         upButton = new ImageButton(upButtonStyle);
         float upBtnWidth = buttonUpTexture.getWidth();
         float upBtnHeight = buttonUpTexture.getHeight();
 
-        // Configura botao de down (próxima página)
+        // Configura botao de down
         ImageButton.ImageButtonStyle downButtonStyle = new ImageButton.ImageButtonStyle();
         downButtonStyle.imageUp = new TextureRegionDrawable(buttonDownTexture);
         downButton = new ImageButton(downButtonStyle);
@@ -112,18 +112,18 @@ public class LevelsScreen implements Screen {
 
         // Define tamanho e posicao dos botoes de navegacao
         upButton.setSize(upBtnWidth * scale, upBtnHeight * scale);
-        upButton.setPosition((DropGame.VIRTUAL_WIDTH - upBtnWidth * scale) / 2, 725);
+        upButton.setPosition((BitItGame.VIRTUAL_WIDTH - upBtnWidth * scale) / 2, 725);
         stage.addActor(upButton);
 
         downButton.setSize(downBtnWidth * scale, downBtnHeight * scale);
-        downButton.setPosition((DropGame.VIRTUAL_WIDTH - downBtnWidth * scale) / 2, 30);
+        downButton.setPosition((BitItGame.VIRTUAL_WIDTH - downBtnWidth * scale) / 2, 30);
         stage.addActor(downButton);
 
         backButton.setSize(backBtnWidth * scale, backBtnHeight * scale);
-        backButton.setPosition(100, DropGame.VIRTUAL_HEIGHT - backBtnHeight * scale - 40);
+        backButton.setPosition(100, BitItGame.VIRTUAL_HEIGHT - backBtnHeight * scale - 40);
         stage.addActor(backButton);
 
-        // Listener para navegação de páginas
+        // Listener para navegacao entre paginas
         upButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -147,16 +147,16 @@ public class LevelsScreen implements Screen {
             }
         });
 
-        // Carrega a primeira página de níveis
+        // Carrega a primeira pagina de niveis
         loadLevelsPage(currentPage);
         updateNavigationButtons();
     }
 
     /**
-     * Carrega e exibe os níveis da página especificada
+     * Carrega e exibe os niveis da pagina especificada
      */
     private void loadLevelsPage(int page) {
-        // Limpa botões anteriores
+        // Limpa botoes anteriores
         levelsTable.clear();
         for (LevelButton btn : levelButtons) {
             btn.dispose();
@@ -166,7 +166,7 @@ public class LevelsScreen implements Screen {
         int startIndex = page * LEVELS_PER_PAGE;
         int totalLevels = levelManager.getTotalLevels();
 
-        Gdx.app.log("LevelsScreen", "Carregando página " + page + ", níveis " + startIndex + " a " + (startIndex + LEVELS_PER_PAGE - 1));
+        Gdx.app.log("LevelsScreen", "Carregando pagina " + page + ", niveis " + startIndex + " a " + (startIndex + LEVELS_PER_PAGE - 1));
 
         // Cria matriz 3x2
         for (int row = 0; row < ROWS; row++) {
@@ -183,19 +183,19 @@ public class LevelsScreen implements Screen {
                     // Adiciona listener se estiver desbloqueado
                     if (unlocked) {
                         final int finalLevelIndex = levelIndex;
-                        levelBtn.getButton().addListener(new ClickListener() {
+                        levelBtn.addListener(new ClickListener() {
                             @Override
                             public void clicked(InputEvent event, float x, float y) {
-                                Gdx.app.log("LevelsScreen", "Nível " + (finalLevelIndex + 1) + " clicado");
+                                Gdx.app.log("LevelsScreen", "Nivel " + (finalLevelIndex + 1) + " clicado");
                                 game.setScreen(new GameScreen(game, finalLevelIndex));
                                 dispose();
                             }
                         });
                     }
-
+                    Gdx.app.log("LevelsScreen", "Adicionando nivel " + (levelIndex + 1) + " (Desbloqueado: " + unlocked + ", Completado: " + completed + ") na pos (" + row + ", " + col + ")");
                     levelsTable.add(levelBtn).size(110, 110).pad(10);
                 } else {
-                    // Célula vazia
+                    // Celula vazia
                     levelsTable.add().size(110, 110).pad(10);
                 }
             }
@@ -204,31 +204,31 @@ public class LevelsScreen implements Screen {
     }
 
     /**
-     * Vai para a próxima página
+     * Vai para a proxima pagina
      */
     private void nextPage() {
         if (currentPage < totalPages - 1) {
             currentPage++;
             loadLevelsPage(currentPage);
             updateNavigationButtons();
-            Gdx.app.log("LevelsScreen", "Próxima página: " + currentPage);
+            Gdx.app.log("LevelsScreen", "Proxima pagina: " + currentPage);
         }
     }
 
     /**
-     * Volta para a página anterior
+     * Volta para a pagina anterior
      */
     private void previousPage() {
         if (currentPage > 0) {
             currentPage--;
             loadLevelsPage(currentPage);
             updateNavigationButtons();
-            Gdx.app.log("LevelsScreen", "Página anterior: " + currentPage);
+            Gdx.app.log("LevelsScreen", "Pagina anterior: " + currentPage);
         }
     }
 
     /**
-     * Atualiza visibilidade dos botões de navegação
+     * Atualiza visibilidade dos botoes de navegacao
      */
     private void updateNavigationButtons() {
         upButton.setVisible(currentPage > 0);
@@ -277,7 +277,6 @@ public class LevelsScreen implements Screen {
         if (buttonDownTexture != null) buttonDownTexture.dispose();
         if (buttonBackTexture != null) buttonBackTexture.dispose();
 
-        // Limpa botões de níveis
         for (LevelButton btn : levelButtons) {
             btn.dispose();
         }

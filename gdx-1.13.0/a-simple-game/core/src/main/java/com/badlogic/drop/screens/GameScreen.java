@@ -1,6 +1,6 @@
 package com.badlogic.drop.screens;
 
-import com.badlogic.drop.DropGame;
+import com.badlogic.drop.BitItGame;
 import com.badlogic.drop.entities.Circuit;
 import com.badlogic.drop.entities.InputBits;
 import com.badlogic.drop.levels.Level;
@@ -17,10 +17,11 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 /**
- * Tela principal de jogo onde o jogador interage com o circuito lógico
+ * Tela principal de jogo onde o jogador interage com o circuito logico
+ * TEMPORARIO - geracao do circuito esta na branch "samuel"
  */
 public class GameScreen implements Screen {
-    private final DropGame game;
+    private final BitItGame game;
     private final int levelId;
     private Level currentLevel;
     private Circuit circuit;
@@ -29,14 +30,14 @@ public class GameScreen implements Screen {
     private Vector2 touchPos;
     private BitmapFont debugFont;
 
-    public GameScreen(final DropGame game, int levelId) {
+    public GameScreen(final BitItGame game, int levelId) {
         this.game = game;
         this.levelId = levelId;
 
         Gdx.app.log("GameScreen", "Iniciando nível " + (levelId + 1));
 
         // Cria viewport
-        viewport = new FitViewport(DropGame.VIRTUAL_WIDTH, DropGame.VIRTUAL_HEIGHT);
+        viewport = new FitViewport(BitItGame.VIRTUAL_WIDTH, BitItGame.VIRTUAL_HEIGHT);
         touchPos = new Vector2();
 
         // Cria fonte para debug
@@ -60,7 +61,7 @@ public class GameScreen implements Screen {
                 circuit = currentLevel.getCircuit();
 
                 // Atualiza posições dos elementos do circuito
-                circuit.updateAllPos((int)DropGame.VIRTUAL_WIDTH, (int)DropGame.VIRTUAL_HEIGHT);
+                circuit.updateAllPos((int)BitItGame.VIRTUAL_WIDTH, (int)BitItGame.VIRTUAL_HEIGHT);
 
                 // Cria renderizador de fios
                 wireRenderer = new WireRenderer();
@@ -111,8 +112,8 @@ public class GameScreen implements Screen {
 
         // Desenha informações de debug
         game.batch.begin();
-        debugFont.draw(game.batch, "Nível: " + (levelId + 1), 10, DropGame.VIRTUAL_HEIGHT - 10);
-        debugFont.draw(game.batch, "Toque nos inputs para mudar valores", 10, DropGame.VIRTUAL_HEIGHT - 40);
+        debugFont.draw(game.batch, "Nível: " + (levelId + 1), 10, BitItGame.VIRTUAL_HEIGHT - 10);
+        debugFont.draw(game.batch, "Toque nos inputs para mudar valores", 10, BitItGame.VIRTUAL_HEIGHT - 40);
         debugFont.draw(game.batch, "ESC para voltar", 10, 30);
         game.batch.end();
     }
@@ -152,7 +153,7 @@ public class GameScreen implements Screen {
     public void resize(int width, int height) {
         viewport.update(width, height, true);
         if (circuit != null) {
-            circuit.updateAllPos((int)DropGame.VIRTUAL_WIDTH, (int)DropGame.VIRTUAL_HEIGHT);
+            circuit.updateAllPos((int)BitItGame.VIRTUAL_WIDTH, (int)BitItGame.VIRTUAL_HEIGHT);
         }
     }
 
