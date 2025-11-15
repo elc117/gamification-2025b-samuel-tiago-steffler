@@ -1,6 +1,9 @@
 package com.badlogic.drop.entities;
 
+import com.badlogic.drop.entities.gates.InputBits;
 import com.badlogic.drop.entities.gates.LogicGate;
+import com.badlogic.drop.entities.gates.OutputBits;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 
@@ -14,7 +17,7 @@ public class Circuit {
     private final Array<Wire> wires;
 
     // Saídas esperadas
-    private final Array<Boolean> expectedOutput;
+    private Array<Boolean> expectedOutput;
 
     private boolean debugMode = false;
 
@@ -203,7 +206,17 @@ public class Circuit {
                 System.out.println("Posicoes atualizadas para tela " + screenWidth + "x" + screenHeight);
             }
             for (LogicGate gate : gatesInLevel) {
-                gate.updatePos(screenWidth, screenHeight, totalLevels, gatesCount, debugMode);
+                if (gatesInLevel.size == 1 && levelIndex < maxLevel - 2){
+                    // significa que tem um gate nesse nivel e outro acima, deslocar um pouco para os lados e centralizar
+                    if (gate.getLevelIdx() < gatesInLevel.size / 2) {
+                        gate.updatePos(screenWidth - gate.getWidth() / 2, screenHeight, totalLevels, gatesCount, debugMode);
+                    } else {
+                        gate.updatePos(screenWidth + gate.getWidth() / 2, screenHeight, totalLevels, gatesCount, debugMode);
+                    }
+
+                } else {
+                    gate.updatePos(screenWidth, screenHeight, totalLevels, gatesCount, debugMode);
+                }
             }
         }
         // Atualiza os caminhos dos fios
@@ -298,9 +311,14 @@ public class Circuit {
     }
 
     public void setExpectedOutput(String outputLabel, boolean value) {
-        for(int i = 0; i < outputs.size; i++) {
-            if (outputs.get(i).getLabel().equals(outputLabel)) {
-                expectedOutput.set(i, value);
+        for(OutputBits output : outputs) {
+            if (output.getLabel().equals(outputLabel)) {
+                if(debugMode){
+                    Gdx.app.log("Circuit.setExpectedOutput", "Definindo saida esperada " + outputLabel + " para " + value);
+                    Gdx.app.log("Circuit.setExpectedOutput", "Indice da saida: " + outputs.indexOf(output, true));
+                    Gdx.app.log("Circuit.setExpectedOutput", "Tamanho de expectedOutput: " + expectedOutput.size);
+                }
+                expectedOutput.set(outputs.indexOf(output, true), value);
                 return;
             }
         }
@@ -316,6 +334,14 @@ public class Circuit {
         for (int i = 0; i < evaluationOrder.size; i++) {
             LogicGate gate = evaluationOrder.get(i);
             System.out.println((i + 1) + ". " + gate.getGateType() + " gate");
+        }
+    }
+
+
+    // Reseta os inputs para false
+    public void resetInputs() {
+        for (InputBits input : inputs) {
+            input.setValue(false);
         }
     }
 }

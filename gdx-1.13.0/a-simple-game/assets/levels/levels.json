@@ -27,9 +27,7 @@
 			}
 		],
 		"solution": {
-			"values": {
-				"X0": true
-			}
+			"X0": true
 		}
 	},
 	{
@@ -70,9 +68,7 @@
 			}
 		],
 		"solution": {
-			"values": {
-				"X0": true
-			}
+			"X0": true
 		}
 	},
 	{
@@ -120,9 +116,7 @@
 			}
 		],
 		"solution": {
-			"values": {
-				"X0": true
-			}
+			"X0": true
 		}
 	},
 	{
@@ -178,9 +172,7 @@
 			}
 		],
 		"solution": {
-			"values": {
-				"X0": true
-			}
+			"X0": true
 		}
 	},
 	{
@@ -252,9 +244,7 @@
 			}
 		],
 		"solution": {
-			"values": {
-				"X0": true
-			}
+			"X0": true
 		}
 	},
 	{
@@ -317,9 +307,7 @@
 			}
 		],
 		"solution": {
-			"values": {
-				"X0": true
-			}
+			"X0": true
 		}
 	},
 	{
@@ -405,10 +393,8 @@
 			}
 		],
 		"solution": {
-			"values": {
-				"X1": true,
-				"X0": true
-			}
+			"X1": true,
+			"X0": true
 		}
 	},
 	{
@@ -493,6 +479,7 @@
 				"label": "8",
 				"type": "AND",
 				"inputs": {
+					"1": "I3",
 					"0": "7"
 				}
 			}
@@ -508,10 +495,8 @@
 			}
 		],
 		"solution": {
-			"values": {
-				"X1": true,
-				"X0": true
-			}
+			"X1": true,
+			"X0": true
 		}
 	},
 	{
@@ -568,9 +553,7 @@
 			}
 		],
 		"solution": {
-			"values": {
-				"X0": true
-			}
+			"X0": true
 		}
 	},
 	{
@@ -627,9 +610,7 @@
 			}
 		],
 		"solution": {
-			"values": {
-				"X0": true
-			}
+			"X0": true
 		}
 	},
 	{
@@ -704,9 +685,7 @@
 			}
 		],
 		"solution": {
-			"values": {
-				"X0": true
-			}
+			"X0": true
 		}
 	},
 	{
@@ -800,10 +779,8 @@
 			}
 		],
 		"solution": {
-			"values": {
-				"X1": true,
-				"X0": true
-			}
+			"X1": true,
+			"X0": true
 		}
 	}
 ]

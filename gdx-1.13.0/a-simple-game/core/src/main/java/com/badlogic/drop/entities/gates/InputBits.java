@@ -1,6 +1,5 @@
-package com.badlogic.drop.entities;
+package com.badlogic.drop.entities.gates;
 
-import com.badlogic.drop.entities.gates.LogicGate;
 import com.badlogic.gdx.graphics.Texture;
 
 /**
@@ -38,6 +37,8 @@ public class InputBits extends LogicGate {
         this.gateType = "INPUT";
         this.width = 108f;
         this.height = 108f;
+        this.setTextureOff(new Texture("textures/bits/in_off.png"));
+        this.setTextureOn(new Texture("textures/bits/in_on.png"));
         if (initialValue) {
             this.setTexture(this.textureOn);
         } else {
