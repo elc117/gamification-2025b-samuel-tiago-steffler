@@ -11,8 +11,8 @@ public class OutputBits extends LogicGate {
     /**
      * Construtor - cria um output com 1 entrada
      */
-    public OutputBits(String label) {
-        super(label, 1); // 1 input (recebe sinal de outra porta)
+    public OutputBits(String label, float scale) {
+        super(label, 1, scale); // 1 input (recebe sinal de outra porta)
         this.gateType = "OUTPUT";
 
         // Tamanho do icone PNG

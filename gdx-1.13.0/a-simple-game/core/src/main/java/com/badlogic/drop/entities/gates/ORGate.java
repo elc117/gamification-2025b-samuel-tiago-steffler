@@ -7,8 +7,8 @@ import com.badlogic.gdx.graphics.Texture;
 public class ORGate extends LogicGate {
 
     // construtor padrão da porta OR
-    public ORGate(String label){
-        super(label, 2); // default 2
+    public ORGate(String label, float scale) {
+        super(label, 2, scale); // default 2
         this.gateType = "OR";
         // Tamanho do icone PNG
         this.width = 131f;
@@ -19,8 +19,8 @@ public class ORGate extends LogicGate {
     }
 
     // construtor para porta OR com varias entradas
-    public ORGate(String label, int numInputs) {
-        super(label, numInputs);
+    public ORGate(String label, int numInputs, float scale) {
+        super(label, numInputs, scale);
         this.gateType = "OR";
         this.width = 131f;
         this.height = 154f;

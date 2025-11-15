@@ -14,6 +14,7 @@ public abstract class LogicGate {
     protected Vector2 position;
     protected float width;
     protected float height;
+    protected float scale;
 
     // Logica
     protected boolean[] inputs;
@@ -34,12 +35,13 @@ public abstract class LogicGate {
     // numInputs - numero de entradas da porta logica
     // x - posição X na tela
     // y - posição Y na tela
-    public LogicGate(String label, int numInputs) {
+    public LogicGate(String label, int numInputs, float scale) {
         this.label = label;
         this.numInputs = numInputs;
         this.inputs = new boolean[numInputs];
         this.position = new Vector2(0, 0);
         this.output = false;
+        this.scale = scale;
 
         // dimensoes padrao
         this.width = 64f;
@@ -67,7 +69,7 @@ public abstract class LogicGate {
         // ------------------ Margens - modificar se preciso ------------------
         float bottom = 150f;    // Espaço na parte inferior
         float top = 150f;       // Espaço no topo
-        float sides = 200f;     // Espaço nas laterais
+        float sides = 100f;     // Espaço nas laterais
         
 
 
@@ -86,11 +88,11 @@ public abstract class LogicGate {
         float x;
         if (gateLevel == 1) {
             // se for apenas um gate (tipo um output), centraliza
-            x = screenWidth / 2 - width / 2;
+            x = screenWidth / 2 - this.getWidth() / 2;
         } else {
             // Distribui uniforme
             float spacing = lUtil / (gateLevel - 1);
-            x = sides + (levelIdx * spacing) - width / 2;
+            x = sides + (levelIdx * spacing) - this.getWidth() / 2;
         }
         if (debugMode) {
             System.out.println("Gate " + gateType + " nivel " + level + " indice " + levelIdx + 
@@ -147,7 +149,7 @@ public abstract class LogicGate {
     }
 
     public float getWidth() {
-        return width;
+        return width * scale;
     }
 
     public void setWidth(float width) {
@@ -155,7 +157,7 @@ public abstract class LogicGate {
     }
 
     public float getHeight() {
-        return height;
+        return height * scale;
     }
 
     public void setHeight(float height) {
@@ -221,7 +223,7 @@ public abstract class LogicGate {
     // - batch: SpriteBatch usado para desenhar a textura
     public void render(SpriteBatch batch) {
         if (texture != null) {
-            batch.draw(texture, position.x, position.y, width, height);
+            batch.draw(texture, position.x, position.y, this.getWidth(), this.getHeight());
         }
     }
 

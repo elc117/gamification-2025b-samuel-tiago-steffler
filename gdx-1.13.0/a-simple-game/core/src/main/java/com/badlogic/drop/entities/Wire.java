@@ -1,6 +1,7 @@
 package com.badlogic.drop.entities;
 
 import com.badlogic.drop.entities.gates.LogicGate;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -26,7 +27,7 @@ public final class Wire {
     protected float seglen = 60f;
 
     // Espessura da linha do fio
-    protected float lineWidth = 8f;
+    protected float lineWidth = 5f;
     
     // Cores para diferentes estados
     protected Color activeColor;    // cor quando true
@@ -81,7 +82,7 @@ public final class Wire {
         this.toY = toGate.getY() + 30;
         
         // Recalcula o caminho
-        calculatePath();
+        calculatePath(false);
     }
     
     /**
@@ -94,12 +95,12 @@ public final class Wire {
      * Fios terão dobras mais próximas das portas de destino e vão descendo de acordo com a posição da porta de origem.
      * Isso permite criar "grids" de linhas sem haver overlapping de fios.
      */
-    protected void calculatePath() {
+    protected void calculatePath(boolean debug) {
         pathPoints.clear();
-        
+        if(debug) Gdx.app.log("Wire.calculatePath", "Calculando pontos entre " + fromGate.getLabel() + " e " + toGate.getLabel());
         // Ponto inicial (saída da porta de origem)
         pathPoints.add(new Vector2(fromX, fromY));
-        
+        if(debug) Gdx.app.log("Wire.calculatePath", "ponto 1: (" + fromX + ", " + fromY + ")");
         // Determina qual elemento tem o Y maior (mais superior na tela)
         float referenceY;
         float referenceX;
@@ -123,16 +124,24 @@ public final class Wire {
         
         // Ponto após sair verticalmente da origem
         pathPoints.add(new Vector2(fromX, horizontalY));
+        if(debug) Gdx.app.log("Wire.calculatePath", "ponto 2: (" + fromX + ", " + horizontalY + ")");
         
         // Ponto antes de descer verticalmente para o destino (mesma altura, mas X do destino)
         pathPoints.add(new Vector2(toX, horizontalY));
+        if(debug) Gdx.app.log("Wire.calculatePath", "ponto 3: (" + toX + ", " + horizontalY + ")");
         
-        // Ponto antes de entrar na porta de destino (segmento reto final)
-        float entryY = toY - seglen;
-        pathPoints.add(new Vector2(toX, entryY));
+        // workaround achado para evitar pequenos segmentos que bugam o render
+        // se o segmento for muito pequeno, nem sera adicionado
+        float entryY = (horizontalY < toY) ? Math.max(horizontalY, toY - seglen) : Math.min(horizontalY, toY + seglen);
+        if (Math.abs(entryY - horizontalY) > 1f && Math.abs(entryY - toY) > 1f) {
+            pathPoints.add(new Vector2(toX, entryY));
+            if(debug) Gdx.app.log("Wire.calculatePath", "ponto 4: (" + toX + ", " + entryY + ")");
+        }
         
         // Ponto final (entrada da porta de destino)
         pathPoints.add(new Vector2(toX, toY));
+        if(debug) Gdx.app.log("Wire.calculatePath", "ponto 5: (" + toX + ", " + toY + ")");
+        if(debug) Gdx.app.log("Wire.calculatePath", "==============================");
     }
     
     /**
@@ -188,7 +197,7 @@ public final class Wire {
     
     public void setSeglen(float length) {
         this.seglen = length;
-        calculatePath(); // Recalcula quando muda
+        calculatePath(false); // Recalcula quando muda
     }
     
     /**

@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 public class LevelManager {
     private Array<Level> levels;
     private static LevelManager instance;
+    private int currLevel;
 
     private LevelManager() {
         levels = new Array<>();
@@ -28,7 +29,7 @@ public class LevelManager {
     private void loadLevels() {
         try {
             JSONtoCircuit converter = new JSONtoCircuit();
-            levels = converter.convert(Gdx.files.internal("levels/levels.json"));
+            levels = converter.convert(Gdx.files.internal("levels/levels.json"), true);
             Gdx.app.log("LevelManager", "Carregados " + levels.size + " níveis");
         } catch (Exception e) {
             Gdx.app.error("LevelManager", "Erro ao carregar níveis", e);
@@ -58,5 +59,14 @@ public class LevelManager {
      */
     public int getTotalLevels() {
         return levels.size;
+    }
+
+    public int getCurrLevelIdx() {
+        return currLevel;
+    }
+
+    public int setCurrLevelIdx(int idx) {
+        this.currLevel = idx;
+        return this.currLevel;
     }
 }

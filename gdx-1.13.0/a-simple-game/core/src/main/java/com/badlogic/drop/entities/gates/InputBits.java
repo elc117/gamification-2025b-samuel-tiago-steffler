@@ -14,8 +14,8 @@ public class InputBits extends LogicGate {
     /**
      * Construtor padrão - cria um input com valor falso
      */
-    public InputBits(String label) {
-        super(label, 0); // 0 inputs (fonte de sinal)
+    public InputBits(String label, float scale) {
+        super(label, 0, scale); // 0 inputs (fonte de sinal)
         this.label = label;
         this.value = false;
         this.gateType = "INPUT";
@@ -31,8 +31,8 @@ public class InputBits extends LogicGate {
     /**
      * Construtor de input com valor predefinido
      */
-    public InputBits(String label, boolean initialValue) {
-        super(label, 0); // 0 inputs
+    public InputBits(String label, boolean initialValue, float scale) {
+        super(label, 0, scale); // 0 inputs
         this.value = initialValue;
         this.gateType = "INPUT";
         this.width = 108f;

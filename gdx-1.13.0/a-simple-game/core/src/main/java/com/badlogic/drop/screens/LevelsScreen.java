@@ -40,17 +40,22 @@ public class LevelsScreen implements Screen {
     private static final int LEVELS_PER_PAGE = 6; // 3x2
     private static final int ROWS = 3;
     private static final int COLS = 2;
-    private int currentPage = 0;
+    private int currentPage;
     private int totalPages;
 
-    private ImageButton upButton;
-    private ImageButton downButton;
+    private final ImageButton upButton;
+    private final ImageButton downButton;
 
     public LevelsScreen(final BitItGame game) {
+        this(game, 0);
+    }
+
+    public LevelsScreen(final BitItGame game, int startPage) {
         this.game = game;
+        this.currentPage = startPage;
 
         // Inicializa gerenciadores
-        levelManager = LevelManager.getInstance();
+        levelManager = game.getLevelManager();
         levelProgress = LevelProgress.getInstance();
         levelButtons = new Array<>();
 
@@ -143,7 +148,7 @@ public class LevelsScreen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 Gdx.app.log("LevelScreen", "Botao back clicado");
                 game.setScreen(new MenuScreen(game));
-                dispose();
+                //dispose();
             }
         });
 
@@ -174,8 +179,11 @@ public class LevelsScreen implements Screen {
                 int levelIndex = startIndex + (row * COLS) + col;
 
                 if (levelIndex < totalLevels) {
-                    boolean unlocked = levelProgress.isLevelUnlocked(levelIndex);
-                    boolean completed = levelProgress.isLevelCompleted(levelIndex);
+                    //boolean unlocked = levelProgress.isLevelUnlocked(levelIndex);
+                    //boolean completed = levelProgress.isLevelCompleted(levelIndex);
+
+                    boolean unlocked = levelManager.getLevel(levelIndex).isUnlocked();
+                    boolean completed = levelManager.getLevel(levelIndex).isCompleted();
 
                     final LevelButton levelBtn = new LevelButton(levelIndex, unlocked, completed, game.font);
                     levelButtons.add(levelBtn);
@@ -187,8 +195,9 @@ public class LevelsScreen implements Screen {
                             @Override
                             public void clicked(InputEvent event, float x, float y) {
                                 Gdx.app.log("LevelsScreen", "Nivel " + (finalLevelIndex + 1) + " clicado");
+                                //dispose();                
+                                game.getLevelManager().setCurrLevelIdx(finalLevelIndex);
                                 game.setScreen(new GameScreen(game, finalLevelIndex));
-                                dispose();
                             }
                         });
                     }

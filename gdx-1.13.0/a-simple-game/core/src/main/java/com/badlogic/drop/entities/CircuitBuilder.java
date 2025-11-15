@@ -24,7 +24,7 @@ public class CircuitBuilder {
     private final Array<Wire> wires;
     private final Array<OutputBits> outputs;
     private Array<Boolean> expectedOutput;
-
+    private final float scale = 0.6f;
     // construtor default
     public CircuitBuilder() {
         this.inputs = new Array<>();
@@ -38,7 +38,7 @@ public class CircuitBuilder {
      * Adiciona um input ao circuito
      */
     public CircuitBuilder addInput(String label) {
-        inputs.add(new InputBits(label));
+        inputs.add(new InputBits(label, scale));
         return this;
     }
 
@@ -46,7 +46,7 @@ public class CircuitBuilder {
      * Adiciona um input com valor inicial
      */
     public CircuitBuilder addInput(String label, boolean initialValue) {
-        inputs.add(new InputBits(label, initialValue));
+        inputs.add(new InputBits(label, initialValue, scale));
         return this;
     }
 
@@ -54,7 +54,7 @@ public class CircuitBuilder {
      * Adiciona um output ao circuito
      */
     public CircuitBuilder addOutput(String label) {
-        outputs.add(new OutputBits(label));
+        outputs.add(new OutputBits(label, scale));
         return this;
     }
 
@@ -62,7 +62,7 @@ public class CircuitBuilder {
      * Adiciona uma porta AND
      */
     public CircuitBuilder addAND(String label) {
-        gates.add(new ANDGate(label));
+        gates.add(new ANDGate(label, scale));
         return this;
     }
 
@@ -70,7 +70,7 @@ public class CircuitBuilder {
      * Adiciona uma porta OR
      */
     public CircuitBuilder addOR(String label) {
-        gates.add(new ORGate(label));
+        gates.add(new ORGate(label, scale));
         return this;
     }
 
@@ -78,7 +78,7 @@ public class CircuitBuilder {
      * Adiciona uma porta NOT
      */
     public CircuitBuilder addNOT(String label) {
-        gates.add(new NOTGate(label));
+        gates.add(new NOTGate(label, scale));
         return this;
     }
 
@@ -86,7 +86,7 @@ public class CircuitBuilder {
      * Adiciona uma porta XOR
      */
     public CircuitBuilder addXOR(String label) {
-        gates.add(new XORGate(label));
+        gates.add(new XORGate(label, scale));
         return this;
     }
 
@@ -94,7 +94,7 @@ public class CircuitBuilder {
      * Adiciona uma porta NAND
      */
     public CircuitBuilder addNAND(String label) {
-        gates.add(new NANDGate(label));
+        gates.add(new NANDGate(label, scale));
         return this;
     }
 
@@ -102,7 +102,7 @@ public class CircuitBuilder {
      * Adiciona uma porta NOR
      */
     public CircuitBuilder addNOR(String label) {
-        gates.add(new NORGate(label));
+        gates.add(new NORGate(label, scale));
         return this;
     }
 
@@ -110,7 +110,7 @@ public class CircuitBuilder {
      * Adiciona uma porta XNOR
      */
     public CircuitBuilder addXNOR(String label) {
-        gates.add(new XNORGate(label));
+        gates.add(new XNORGate(label, scale));
         return this;
     }
 
@@ -170,7 +170,7 @@ public class CircuitBuilder {
         // Att. agora n precisa mais criar inputs, eles sao criados automaticamente com outputs se nao existem
         InputBits input = getInput(from);
         if (input == null) {
-            input = new InputBits(from);
+            input = new InputBits(from, scale);
             inputs.add(input);
         }
 
@@ -218,7 +218,7 @@ public class CircuitBuilder {
         }
 
         // Se não encontrou nem como gate nem como input, cria um input automaticamente
-        fromInput = new InputBits(from);
+        fromInput = new InputBits(from, scale);
         inputs.add(fromInput);
         wires.add(new Wire(fromInput, fromOutputIndex, toGate, toInputIndex));
         return this;
@@ -239,7 +239,7 @@ public class CircuitBuilder {
         // (estado sera atualizado pelo ultimo gate modificado ou ultimo wire processado)
         OutputBits output = getOutput(label);
         if (output == null) {
-            output = new OutputBits(label);
+            output = new OutputBits(label, scale);
             outputs.add(output);
         }
 

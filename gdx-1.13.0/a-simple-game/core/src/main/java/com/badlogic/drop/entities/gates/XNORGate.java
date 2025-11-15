@@ -7,8 +7,8 @@ import com.badlogic.gdx.graphics.Texture;
 public class XNORGate extends LogicGate {
 
     // construtor padrao para a porta XNOR 2 entradas
-    public XNORGate(String label) {
-        super(label, 2); // default 2
+    public XNORGate(String label, float scale) {
+        super(label, 2, scale); // default 2
         this.gateType = "XNOR";
         // Tamanho do icone PNG
         this.width = 131f;
@@ -19,8 +19,8 @@ public class XNORGate extends LogicGate {
     }
 
     // construtor para porta XNOR com varias entradas
-    public XNORGate(String label, int numInputs) {
-        super(label, numInputs);
+    public XNORGate(String label, int numInputs, float scale) {
+        super(label, numInputs, scale);
         this.gateType = "XNOR";
         this.width = 131f;
         this.height = 154f;

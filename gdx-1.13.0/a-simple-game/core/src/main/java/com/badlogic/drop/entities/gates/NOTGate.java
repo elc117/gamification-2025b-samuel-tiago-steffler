@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.Texture;
 public class NOTGate extends LogicGate {
 
     // construtor para porta NOT com 1 entrada
-    public NOTGate(String label) {
-        super(label, 1); // maximo 1 entrada
+    public NOTGate(String label, float scale) {
+        super(label, 1, scale); // maximo 1 entrada
         this.gateType = "NOT";
         // Tamanho do icone PNG
         this.width = 131f;
