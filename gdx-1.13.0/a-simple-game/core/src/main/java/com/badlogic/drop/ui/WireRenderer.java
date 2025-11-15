@@ -13,7 +13,7 @@ public class WireRenderer {
 
     private final ShapeRenderer shapeRenderer;
     private final boolean ownsRenderer; // se este renderer criou o ShapeRenderer
-    private boolean debugOnce = true;
+    private boolean debugOnce = false;
     // Cria um WireRenderer com seu proprio ShapeRenderer
     public WireRenderer() {
         this.shapeRenderer = new ShapeRenderer();

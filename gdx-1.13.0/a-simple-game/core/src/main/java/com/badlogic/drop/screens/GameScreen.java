@@ -225,7 +225,7 @@ public class GameScreen implements Screen {
                     }
                     //dispose();
                     
-                    int levelPage = (levelId + 1) / 6; // LEVELS_PER_PAGE = 6
+                    int levelPage = (levelId < levelManager.getTotalLevels() - 1 ? levelId + 1 : levelId) / 6; // LEVELS_PER_PAGE = 6
                     game.setScreen(new LevelsScreen(game, levelPage));
                 }
 
