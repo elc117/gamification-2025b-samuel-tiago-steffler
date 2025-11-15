@@ -17,15 +17,13 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
  * Tela inicial do jogo
  */
 public class MenuScreen implements Screen {
-    private final BitItGame game;
-    private Stage stage;
+    private final Stage stage;
     private Texture backgroundTexture;
     private Texture playButtonTexture;
     private Texture creditsButtonTexture;
     private Image backgroundImage;
 
     public MenuScreen(final BitItGame game) {
-        this.game = game;
 
         // Carrega texturas
         try {

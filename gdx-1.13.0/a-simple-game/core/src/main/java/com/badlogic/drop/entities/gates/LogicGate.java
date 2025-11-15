@@ -14,6 +14,7 @@ public abstract class LogicGate {
     protected Vector2 position;
     protected float width;
     protected float height;
+    protected float scale;
 
     // Logica
     protected boolean[] inputs;
@@ -34,12 +35,13 @@ public abstract class LogicGate {
     // numInputs - numero de entradas da porta logica
     // x - posição X na tela
     // y - posição Y na tela
-    public LogicGate(String label, int numInputs) {
+    public LogicGate(String label, int numInputs, float scale) {
         this.label = label;
         this.numInputs = numInputs;
         this.inputs = new boolean[numInputs];
         this.position = new Vector2(0, 0);
         this.output = false;
+        this.scale = scale;
 
         // dimensoes padrao
         this.width = 64f;
@@ -63,35 +65,45 @@ public abstract class LogicGate {
                                int levelTot, int gateLevel, boolean debugMode) {
 
 
-
         // ------------------ Margens - modificar se preciso ------------------
-        float bottom = 150f;    // Espaço na parte inferior
+        float bottom = 50f;    // Espaço na parte inferior
         float top = 150f;       // Espaço no topo
-        float sides = 200f;     // Espaço nas laterais
-        
-
+        float sides = 70f;     // Espaço nas laterais
 
         // Altura util do circuito
         // vou descontar a altura do output ja que a renderizacao comeca no canto inferior esquerdo
         float aUtil = screenHeight - bottom - top;
         
         // Calcula Y baseado no nivel (0 = bottom, totalLevels - 1 = top)
-        float espac = levelTot > 1 ? (aUtil) / (levelTot - 1) : 0;
-        float y = bottom + (level * espac);
-        
+        float espacVer = levelTot > 1 ? (aUtil) / (levelTot - 1) : 0;
+        float y = bottom + (level * espacVer);
+
         // Largura util para distribuir gates horizontalmente
         float lUtil = screenWidth - (2 * sides);
+        // espacamento dos gates desocntando as larguras deles mesmos
+        // ideia: espacHor + gate.width + espacHor + gate.width + espacHor
+        float espacHor;
+        if (gateLevel < 3) {
+            espacHor = (lUtil - (gateLevel * getWidth())) / (gateLevel + 1);
+        } else {
+            espacHor = (lUtil - (gateLevel * getWidth())) / (gateLevel - 1);
+        }
+        //System.out.println("lUtil: " + lUtil + " espacHor: " + espacHor);
+        //System.out.println("Largura total espacHor + gates: " + (espacHor * (gateLevel + 1) + gateLevel * getWidth()));
+        
         
         // Calcula X baseado no indice dentro do nível
         float x;
         if (gateLevel == 1) {
             // se for apenas um gate (tipo um output), centraliza
-            x = screenWidth / 2 - width / 2;
+            x = screenWidth / 2 - this.getWidth() / 2;
+        } else if (gateLevel < 3) {
+            // Distribui uniforme com espacamento por fora
+            x = sides + ((levelIdx + 1) * espacHor) + (levelIdx * getWidth()); // - this.getWidth() / 2;
         } else {
-            // Distribui uniforme
-            float spacing = lUtil / (gateLevel - 1);
-            x = sides + (levelIdx * spacing) - width / 2;
-        }
+            // Distribui uniforme sem espacamento por fora
+            x = sides + (levelIdx * (espacHor + getWidth())); // - this.getWidth() / 2;
+        }   
         if (debugMode) {
             System.out.println("Gate " + gateType + " nivel " + level + " indice " + levelIdx + 
                                " posicao atualizada para (" + x + ", " + y + ")");
@@ -147,7 +159,7 @@ public abstract class LogicGate {
     }
 
     public float getWidth() {
-        return width;
+        return width * scale;
     }
 
     public void setWidth(float width) {
@@ -155,7 +167,7 @@ public abstract class LogicGate {
     }
 
     public float getHeight() {
-        return height;
+        return height * scale;
     }
 
     public void setHeight(float height) {
@@ -221,7 +233,7 @@ public abstract class LogicGate {
     // - batch: SpriteBatch usado para desenhar a textura
     public void render(SpriteBatch batch) {
         if (texture != null) {
-            batch.draw(texture, position.x, position.y, width, height);
+            batch.draw(texture, position.x, position.y, this.getWidth(), this.getHeight());
         }
     }
 

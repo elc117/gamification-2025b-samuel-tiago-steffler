@@ -1,6 +1,7 @@
 package com.badlogic.drop.ui;
 
 import com.badlogic.drop.entities.Wire;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -12,7 +13,7 @@ public class WireRenderer {
 
     private final ShapeRenderer shapeRenderer;
     private final boolean ownsRenderer; // se este renderer criou o ShapeRenderer
-
+    private boolean debugOnce = false;
     // Cria um WireRenderer com seu proprio ShapeRenderer
     public WireRenderer() {
         this.shapeRenderer = new ShapeRenderer();
@@ -41,18 +42,21 @@ public class WireRenderer {
         }
 
         Color color = wire.getCurrentColor();
-        shapeRenderer.setColor(color);
-
         float lineWidth = wire.getLineWidth();
-
+        //Gdx.app.log("WireRenderer", "quantidade de pontos " + points.size);
         // Desenha segmentos conectando os pontos
         for (int i = 0; i < points.size - 1; i++) {
             Vector2 start = points.get(i);
             Vector2 end = points.get(i + 1);
 
+            if(debugOnce) color = new Color(100*(9 & (1 << i)), 100*(18 & (1 << i)), 100*(36 & (1 << i)), 1);
+            shapeRenderer.setColor(color);
+
             // Desenha linha grossa usando retangulo
+            if(debugOnce) Gdx.app.log("WireRenderer", "Fio " + wire.getFromGate().getLabel() + "->" + wire.getToGate().getLabel() + " ponto " + i + ": (" + start.x + ", " + start.y + ") to (" + end.x + ", " + end.y + ")");
             drawThickLine(start.x, start.y, end.x, end.y, lineWidth);
         }
+        if (debugOnce) Gdx.app.log("WireRenderer", "===============================================");
 
         if (autoBeginEnd) {
             shapeRenderer.end();
@@ -69,7 +73,7 @@ public class WireRenderer {
         for (Wire wire : wires) {
             render(wire, false); // false porque ja chamamos begin()
         }
-
+        debugOnce = false;
         shapeRenderer.end();
     }
 
@@ -79,7 +83,8 @@ public class WireRenderer {
         float dy = y2 - y1;
         float length = (float) Math.sqrt(dx * dx + dy * dy);
 
-        if (length == 0) return;
+        // Pula segmentos muito curtos que causam glitches visuais
+        if (length < thickness * 0.5f) return;
 
         // Ajusta Y para linhas que vão da direita para a esquerda (dx negativo)
         // para compensar o deslocamento causado pela rotação

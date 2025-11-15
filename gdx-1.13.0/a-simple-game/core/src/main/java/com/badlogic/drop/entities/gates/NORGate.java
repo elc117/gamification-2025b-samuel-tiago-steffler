@@ -7,8 +7,8 @@ import com.badlogic.gdx.graphics.Texture;
 public class NORGate extends LogicGate {
 
     // construtor para porta NOR padrao com 2 entradas
-    public NORGate(String label) {
-        super(label, 2); // default 2
+    public NORGate(String label, float scale) {
+        super(label, 2, scale); // default 2
         this.gateType = "NOR";
 
         // Tamanho do icone PNG
@@ -20,8 +20,8 @@ public class NORGate extends LogicGate {
     }
 
     // construtor para porta NOR com varias entradas
-    public NORGate(String label, int numInputs) {
-        super(label, numInputs);
+    public NORGate(String label, int numInputs, float scale) {
+        super(label, numInputs, scale);
         this.gateType = "NOR";
         this.width = 131f;
         this.height = 154f;

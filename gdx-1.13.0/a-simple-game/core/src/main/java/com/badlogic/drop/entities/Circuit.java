@@ -206,7 +206,7 @@ public class Circuit {
                 System.out.println("Posicoes atualizadas para tela " + screenWidth + "x" + screenHeight);
             }
             for (LogicGate gate : gatesInLevel) {
-                if (gatesInLevel.size == 1 && levelIndex < maxLevel - 2){
+                /*if (gatesInLevel.size == 1 && levelIndex < maxLevel - 2){
                     // significa que tem um gate nesse nivel e outro acima, deslocar um pouco para os lados e centralizar
                     if (gate.getLevelIdx() < gatesInLevel.size / 2) {
                         gate.updatePos(screenWidth - gate.getWidth() / 2, screenHeight, totalLevels, gatesCount, debugMode);
@@ -214,9 +214,9 @@ public class Circuit {
                         gate.updatePos(screenWidth + gate.getWidth() / 2, screenHeight, totalLevels, gatesCount, debugMode);
                     }
 
-                } else {
+                } else {*/
                     gate.updatePos(screenWidth, screenHeight, totalLevels, gatesCount, debugMode);
-                }
+                //}
             }
         }
         // Atualiza os caminhos dos fios

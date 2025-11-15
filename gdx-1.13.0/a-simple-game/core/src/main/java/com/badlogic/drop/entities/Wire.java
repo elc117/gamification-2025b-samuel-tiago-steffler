@@ -1,6 +1,7 @@
 package com.badlogic.drop.entities;
 
 import com.badlogic.drop.entities.gates.LogicGate;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -26,7 +27,7 @@ public final class Wire {
     protected float seglen = 60f;
 
     // Espessura da linha do fio
-    protected float lineWidth = 8f;
+    protected float lineWidth = 5f;
     
     // Cores para diferentes estados
     protected Color activeColor;    // cor quando true
@@ -81,7 +82,7 @@ public final class Wire {
         this.toY = toGate.getY() + 30;
         
         // Recalcula o caminho
-        calculatePath();
+        calculatePath(false);
     }
     
     /**
@@ -94,45 +95,96 @@ public final class Wire {
      * Fios terão dobras mais próximas das portas de destino e vão descendo de acordo com a posição da porta de origem.
      * Isso permite criar "grids" de linhas sem haver overlapping de fios.
      */
-    protected void calculatePath() {
+    protected void calculatePath(boolean debug) {
         pathPoints.clear();
+
+        int fromLevelIdx = fromGate.getLevelIdx();
+        int toLevelIdx = toGate.getLevelIdx();
+        int fromLevel = fromGate.getLevel();
+        int toLevel = toGate.getLevel();
+
+        if(debug) Gdx.app.log("Wire.calculatePath", "Calculando pontos entre " + fromGate.getLabel() + " e " + toGate.getLabel());
         
-        // Ponto inicial (saída da porta de origem)
-        pathPoints.add(new Vector2(fromX, fromY));
-        
+        // Calcula a diferença de níveis para ajustar o comportamento do fio
+        int levelDiff = Math.abs(toLevel - fromLevel);
+           
         // Determina qual elemento tem o Y maior (mais superior na tela)
         float referenceY;
-        float referenceX;
-
-        if (fromY > toY) {
-            // Origem está mais superior
+        if (fromLevel > toLevel) {
             referenceY = fromY;
-            referenceX = toX;
         } else {
-            // Destino está mais superior (ou igual)
             referenceY = toY;
-            referenceX = fromX;
+        }
+
+        // Altura do fio horizontal: parte do elemento mais superior
+        // e soma proporcionalmente ao indice da linha onde o fio sai
+        float baseDistance = 50f;
+        float xFactor = 15f; // separacao vertical baseada na posicao do gate na linha
+        float levelDiffFactor = 40f; // Separação vertical adicional baseada em levelDiff
+        float horizontalY = referenceY - baseDistance - (fromLevelIdx * xFactor) - (levelDiff * levelDiffFactor);
+
+        // Ponto inicial (saída da porta de origem)
+        pathPoints.add(new Vector2(fromX, fromY));
+        //pathPoints.add(new Vector2(fromX, fromY + seglen * 0.7f));
+        if(debug) Gdx.app.log("Wire.calculatePath", "ponto 1: (" + fromX + ", " + fromY + ")");
+
+        
+               
+        // evitar pulos de mais de 1 nivel dos fios para evitar overlap com gates
+        if (levelDiff > 1) {
+            // calcula ponto de dobra vertical mais cedo
+            float iniY = fromY + seglen * 0.7f;//S + (baseDistance * 0.5f);
+            
+            // adiciona ponto vertical curto
+            pathPoints.add(new Vector2(fromX, iniY));
+            if(debug) Gdx.app.log("Wire.calculatePath", "ponto 2 (dobra cedo): (" + fromX + ", " + iniY + ")");
+            
+            // ponto X intermediario
+            float xDiff = toX - fromX;
+            float iniX = fromX + (xDiff * 0.6f); // 60% da diferenca X entre inicio e fim
+            //float iniX = toX;
+            pathPoints.add(new Vector2(iniX, iniY));
+            if(debug) Gdx.app.log("Wire.calculatePath", "ponto 3 (horizontal intermed): (" + iniX + ", " + iniY + ")");
+            
+            // desce até a altura do fio horizontal principal
+            pathPoints.add(new Vector2(iniX, horizontalY));
+            if(debug) Gdx.app.log("Wire.calculatePath", "ponto 4 (desce): (" + iniX + ", " + horizontalY + ")");
+            
+            // segue horizontalmente até o X de destino
+            pathPoints.add(new Vector2(toX, horizontalY));
+            if(debug) Gdx.app.log("Wire.calculatePath", "ponto 5 (horizontal final): (" + toX + ", " + horizontalY + ")");
+        } else {
+            // padrao
+            pathPoints.add(new Vector2(fromX, horizontalY));
+            if(debug) Gdx.app.log("Wire.calculatePath", "ponto 2: (" + fromX + ", " + horizontalY + ")");
+            
+            pathPoints.add(new Vector2(toX, horizontalY));
+            if(debug) Gdx.app.log("Wire.calculatePath", "ponto 3: (" + toX + ", " + horizontalY + ")");
         }
         
-        // Altura do fio horizontal: parte do elemento mais superior
-        // e soma proporcionalmente à sua posição X
-        // Fórmula: Yfio = Yref - distanciaBase - (Xref * fator)
-        float baseDistance = 50f;
-        float xFactor = 0.07f;
-        float horizontalY = referenceY - baseDistance - (referenceX * xFactor);
-        
-        // Ponto após sair verticalmente da origem
-        pathPoints.add(new Vector2(fromX, horizontalY));
-        
-        // Ponto antes de descer verticalmente para o destino (mesma altura, mas X do destino)
-        pathPoints.add(new Vector2(toX, horizontalY));
-        
-        // Ponto antes de entrar na porta de destino (segmento reto final)
-        float entryY = toY - seglen;
+        float entryY = /*(horizontalY < toY) ?*/ Math.max(horizontalY, toY - seglen); // : Math.min(horizontalY, toY + seglen);
         pathPoints.add(new Vector2(toX, entryY));
+        if(debug) Gdx.app.log("Wire.calculatePath", "ponto N-1 (entrada): (" + toX + ", " + entryY + ")");
+
         
-        // Ponto final (entrada da porta de destino)
+        // ponto final (entrada da porta de destino)
         pathPoints.add(new Vector2(toX, toY));
+        // workaround para evitar pequenos segmentos que bugam o render
+        // segmentos com comprimento muito pequeno serao apagados
+        for (int i = 0; i < pathPoints.size - 1; ) {
+            Vector2 p1 = pathPoints.get(i);
+            Vector2 p2 = pathPoints.get(i + 1);
+            float dx = p2.x - p1.x;
+            float dy = p2.y - p1.y;
+            float length = (float) Math.sqrt(dx * dx + dy * dy);
+            if (length < lineWidth) {
+                pathPoints.removeIndex(i + 1); // remove o ponto seguinte
+            } else {
+                i++; // tamanho razoavel
+            }
+        }
+        if(debug) Gdx.app.log("Wire.calculatePath", "ponto final: (" + toX + ", " + toY + ")");
+        if(debug) Gdx.app.log("Wire.calculatePath", "==============================");
     }
     
     /**
@@ -188,7 +240,7 @@ public final class Wire {
     
     public void setSeglen(float length) {
         this.seglen = length;
-        calculatePath(); // Recalcula quando muda
+        calculatePath(false); // Recalcula quando muda
     }
     
     /**

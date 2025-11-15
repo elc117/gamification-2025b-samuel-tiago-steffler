@@ -7,8 +7,8 @@ import com.badlogic.gdx.graphics.Texture;
 public class ANDGate extends LogicGate {
 
     // constroi a porta com 2 entradas por default
-    public ANDGate(String label) {
-        super(label, 2); // default 2
+    public ANDGate(String label, float scale) {
+        super(label, 2, scale); // default 2
         this.gateType = "AND";
         this.setTextureOff(new Texture("gates/AND_off.png"));
         this.setTextureOn(new Texture("gates/AND_on.png"));
@@ -19,8 +19,8 @@ public class ANDGate extends LogicGate {
     }
 
     // constroi a porta com número customizado de entradas
-    public ANDGate(String label, int numInputs) {
-        super(label, numInputs);
+    public ANDGate(String label, int numInputs, float scale) {
+        super(label, numInputs, scale);
         this.gateType = "AND";
 
         this.width = 131f;

@@ -7,8 +7,8 @@ import com.badlogic.gdx.graphics.Texture;
 public class XORGate extends LogicGate {
 
     // construtor padrao para a porta XOR 2 entradas
-    public XORGate(String label) {
-        super(label, 2); // default 2
+    public XORGate(String label, float scale) {
+        super(label, 2, scale); // default 2
         this.gateType = "XOR";
         // Tamanho do icone PNG
         this.width = 131f;
@@ -19,8 +19,8 @@ public class XORGate extends LogicGate {
     }
 
     // construtor para porta XOR com varias entradas
-    public XORGate(String label, int numInputs) {
-        super(label, numInputs);
+    public XORGate(String label, int numInputs, float scale) {
+        super(label, numInputs, scale);
         this.gateType = "XOR";
         this.width = 131f;
         this.height = 154f;

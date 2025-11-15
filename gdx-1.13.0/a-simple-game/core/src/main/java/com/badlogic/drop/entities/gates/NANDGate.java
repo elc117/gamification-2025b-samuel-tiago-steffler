@@ -7,8 +7,8 @@ import com.badlogic.gdx.graphics.Texture;
 public class NANDGate extends LogicGate {
 
     // construtor para porta NAND padrao com 2 entradas
-    public NANDGate(String label) {
-        super(label, 2); // default 2 portas
+    public NANDGate(String label, float scale) {
+        super(label, 2, scale); // default 2 portas
         this.gateType = "NAND";
 
         // Tamanho do icone PNG
@@ -20,8 +20,8 @@ public class NANDGate extends LogicGate {
     }
 
     // construtor para porta NAND com varias portas
-    public NANDGate(String label, int numInputs) {
-        super(label, numInputs);
+    public NANDGate(String label, int numInputs, float scale) {
+        super(label, numInputs, scale);
         this.gateType = "NAND";
         this.width = 131f;
         this.height = 154f;
