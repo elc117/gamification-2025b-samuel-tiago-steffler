@@ -28,6 +28,8 @@ public class WireRenderer {
     // Renderiza um unico fio
     // - wire: fio a ser desenhado
     // - autoBeginEnd: se true, chama begin() e end() automaticamente
+    // Fios terão dobras mais próximas das portas de destino e vão descendo de acordo com a posição da porta de origem.
+    // Isso permite criar "grids" de linhas sem haver overlapping de fios.
     public void render(Wire wire, boolean autoBeginEnd) {
         if (wire == null) return;
 
@@ -84,6 +86,8 @@ public class WireRenderer {
         float adjustedY1 = y1;
         if (dx < 0) {
             adjustedY1 += thickness;
+        } else if (dx > 0){
+             x1 -= thickness;
         }
 
         // Desenha retangulo representando a linha

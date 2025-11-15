@@ -28,7 +28,7 @@
                 }
 
             ],
-            "outputs": [
+            "solution": [
                 {
                     "label": "X0",
                     "input": "2"

@@ -1,6 +1,5 @@
-package com.badlogic.drop.entities;
+package com.badlogic.drop.entities.gates;
 
-import com.badlogic.drop.entities.gates.LogicGate;
 import com.badlogic.gdx.graphics.Texture;
 
 /**
