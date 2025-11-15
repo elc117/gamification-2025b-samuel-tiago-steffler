@@ -78,6 +78,24 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 - Atualização do CHANGELOG.md com as mudanças realizadas
 
+## [0.5.0] - 2025-11-15
+
+### Adicionado
+
+- Tela inicial, menus e tela de jogo
+
+### Modificado
+
+- Refatoração na geração do circuito na tela, tanto com o reposicionamento das portas lógicas quanto a criação de fios
+- Refatoração de classes como LevelScreen e GameScreen para facilitar a compreensão
+
+### Corrigido
+
+- Crashes aleatórios e opção para jogar o mesmo jogo mais de uma vez
+
+### Documentação
+
+- Atualização do CHANGELOG.md com as mudanças realizadas
 ---
 
 <!--
@@ -107,3 +125,4 @@ links:
 [0.2.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v0.2.0
 [0.3.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v0.3.0
 [0.4.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v0.4.0
+[0.5.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v0.5.0

@@ -50,7 +50,7 @@ public class GameScreen implements Screen {
 
         // Carrega texturas
         try {
-            backgroundTexture = new Texture(Gdx.files.internal("textures/UI/gamescreen.png"));
+            backgroundTexture = new Texture(Gdx.files.internal("textures/UI/bkgdark.png"));
             backgroundImage = new Image(backgroundTexture);
             backgroundImage.setScale(0.5f);
         } catch (Exception e) {
