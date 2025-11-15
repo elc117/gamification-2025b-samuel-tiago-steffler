@@ -1,13 +1,16 @@
 package com.badlogic.drop.entities;
 
 import com.badlogic.drop.entities.gates.ANDGate;
+import com.badlogic.drop.entities.gates.InputBits;
 import com.badlogic.drop.entities.gates.LogicGate;
 import com.badlogic.drop.entities.gates.NANDGate;
 import com.badlogic.drop.entities.gates.NORGate;
 import com.badlogic.drop.entities.gates.NOTGate;
 import com.badlogic.drop.entities.gates.ORGate;
+import com.badlogic.drop.entities.gates.OutputBits;
 import com.badlogic.drop.entities.gates.XNORGate;
 import com.badlogic.drop.entities.gates.XORGate;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 
 /**
@@ -28,6 +31,7 @@ public class CircuitBuilder {
         this.gates = new Array<>();
         this.wires = new Array<>();
         this.outputs = new Array<>();
+        this.expectedOutput = new Array<>();
     }
 
     /**
@@ -246,18 +250,6 @@ public class CircuitBuilder {
     }
 
     /**
-     * Define os valores esperados para as saídas
-     * @param values Valores esperados (pode ser um valor para cada output ou um array boolean[])
-     */
-    public CircuitBuilder expectOutputs(boolean... values) {
-        this.expectedOutput = new Array<>();
-        for (boolean value : values) {
-            this.expectedOutput.add(value);
-        }
-        return this;
-    }
-
-    /**
      * Constrói o circuito final com base nos componentes adicionados.
      * Esse método precisa ser chamado após todas as adições/conexões.
      * Para conectar inputs a portas, use o método connectInput().
@@ -275,9 +267,13 @@ public class CircuitBuilder {
         if (outputs.size == 0) {
             throw new IllegalStateException("Circuito precisa ter pelo menos uma saida.");
         }
-        if (expectedOutput == null) {
+        if (expectedOutput == null || expectedOutput.size == 0) {
             // Default: todos false
             expectedOutput = new Array<>(outputs.size);
+            for (int i = 0; i < outputs.size; i++) {
+                expectedOutput.add(false);
+            }
+            if (debug) Gdx.app.log("CircuitBuilder.build", "Criando array de resultados com tamanho " + outputs.size);
         }
 
         Circuit circuit = new Circuit(inputs, gates, wires, outputs, expectedOutput, debug);

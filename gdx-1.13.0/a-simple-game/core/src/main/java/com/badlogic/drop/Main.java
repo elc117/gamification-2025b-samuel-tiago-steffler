@@ -1,6 +1,7 @@
 package com.badlogic.drop;
 
-import com.badlogic.drop.entities.InputBits;
+import com.badlogic.drop.entities.Circuit;
+import com.badlogic.drop.entities.gates.InputBits;
 import com.badlogic.drop.levels.JSONtoCircuit;
 import com.badlogic.drop.levels.Level;
 import com.badlogic.gdx.ApplicationListener;
@@ -12,18 +13,21 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-
 public class Main implements ApplicationListener {
     SpriteBatch spriteBatch;
     ScreenViewport viewport;
-
+    int levelIndex = 0;
     Vector2 touchPos;
 
     // Circuit demo
-    private com.badlogic.drop.entities.Circuit circuit;
+    private Circuit circuit;
     private com.badlogic.drop.ui.WireRenderer wireRenderer;
 
     public Preloader preloader;
+
+    private Array<Level> levels;
+
+    private Level currentLevel;
 
     @Override
     public void create() {
@@ -38,76 +42,15 @@ public class Main implements ApplicationListener {
         // ================ criacao do circuito logico ================
         try {
             Gdx.app.log("Main.create", "Buscando niveis em assets/levels/levels.json...");
-            Array<Level> levels;
-            levels = new JSONtoCircuit().convert(Gdx.files.internal("levels/levels.json"));
+            levels = new JSONtoCircuit().convert(Gdx.files.internal("levels/levels.json"), true);
             Gdx.app.log("Main.create", "Niveis carregados: " + levels.size);
             if (levels.size > 0) {
-                Level level1 = levels.get(5);
-                circuit = level1.getCircuit();
+                currentLevel = levels.get(levelIndex);
+                circuit = currentLevel.getCircuit();
             }
             Gdx.app.log("Main.create", "Circuito carregado.");
-            /*Gdx.app.log("Main.create", "Starting circuit creation...");
-            com.badlogic.drop.entities.CircuitBuilder builder = new com.badlogic.drop.entities.CircuitBuilder();
-            Gdx.app.log("Main.create", "CircuitBuilder created successfully");
-
-            //builder.addInput("A"); // input A
-            //builder.addInput("B"); // input B
-            //builder.addInput("C"); // input C
-            Gdx.app.log("Main.create", "Adding gates...");
-
-            builder.addXOR("XOR1"); // XOR gate
-            builder.addAND("AND1"); // AND gate
-            builder.addOR("OR1"); // OR gate
-            builder.addNOT("NOT1"); // NOT gate
-            builder.addNAND("NAND1"); // NAND gate
-            builder.addNOR("NOR1"); // NOR gate
-            builder.addXNOR("XNOR1"); // XNOR gate
-            Gdx.app.log("Main.create", "All gates added successfully");
-
-            // conecta inputs nas gates
-            Gdx.app.log("Main.create", "Connecting inputs to gates...");
-            builder.connectInput("A", "XOR1", 0); // A -> XOR input 0
-            builder.connectInput("B", "XOR1", 1); // B -> XOR input 1
-            builder.connectInput("A", "AND1", 0); // A -> AND input 0
-            builder.connectInput("B", "AND1", 1); // B -> AND input 1
-            builder.connectInput("A", "OR1", 0); // A -> OR input 0
-            builder.connectInput("B", "OR1", 1); // B -> OR input 1
-            builder.connectInput("C", "NOT1", 0); // C -> NOT input 0
-            builder.connectInput("A", "NAND1", 0); // A -> NAND input 0
-            builder.connectInput("B", "NAND1", 1); // B -> NAND input 1
-            builder.connectInput("A", "NOR1", 0); // A -> NOR input 0
-            builder.connectInput("B", "NOR1", 1); // B -> NOR input 1
-            builder.connectInput("A", "XNOR1", 0); // A -> XNOR input 0
-            builder.connectInput("B", "XNOR1", 1); // B -> XNOR input 1
-            Gdx.app.log("Main.create", "All inputs connected successfully");
-
-            // conecta gates nas outputs
-            Gdx.app.log("Main.create", "Adding outputs...");
-            builder.addOutput("X0", "XOR1"); // output X0 na gate XOR
-            builder.addOutput("X1", "AND1"); // output X1 na gate AND
-            builder.addOutput("X2", "OR1"); // output X2 na gate OR
-            builder.addOutput("X3", "NOT1"); // output X3 na gate NOT
-            builder.addOutput("X4", "NAND1"); // output X4 na gate NAND
-            builder.addOutput("X5", "NOR1"); // output X5 na gate NOR
-            builder.addOutput("X6", "XNOR1"); // output X6 na gate XNOR
-            Gdx.app.log("Main.create", "All outputs added successfully");
-
-            // build do circuito
-            Gdx.app.log("Main.create", "Building circuit...");
-            circuit = builder.build(true);
-            Gdx.app.log("Main.create", "Circuit built successfully!");
-            */
-            // Ensure positions and wire endpoints are computed before first frame
-            Gdx.app.log("Main.create", "Computing positions for screen: " + Gdx.graphics.getWidth() + "x" + Gdx.graphics.getHeight());
-            circuit.updateAllPos(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            Gdx.app.log("Main.create", "Positions updated");
-
-            // Create a WireRenderer to draw wires
-            Gdx.app.log("Main.create", "Creating WireRenderer...");
             wireRenderer = new com.badlogic.drop.ui.WireRenderer();
-            wireRenderer.renderAll(circuit.getWires());
-            Gdx.app.log("Main.create", "Circuit creation complete!");
-            
+
         } catch (Exception e) {
             Gdx.app.error("Main.create", "========================================");
             Gdx.app.error("Main.create", "ERROR: Failed to create circuit!");
@@ -149,12 +92,12 @@ public class Main implements ApplicationListener {
             touchPos.set(Gdx.input.getX(), Gdx.input.getY());
             viewport.unproject(touchPos);
 
-            System.out.println("Clique detectado em: (" + (int)touchPos.x + ", " + (int)touchPos.y + ") world pixels");
+            //Gdx.app.log("Main.handleInput", "Clique detectado em: (" + (int)touchPos.x + ", " + (int)touchPos.y + ") world pixels");
 
             // verifica se clicou em algum input bit
             if (circuit != null) {
                 Array<InputBits> inputs = circuit.getInputs();
-                for (com.badlogic.drop.entities.InputBits input : inputs) {
+                for (com.badlogic.drop.entities.gates.InputBits input : inputs) {
                     float ix = input.getX();
                     float iy = input.getY();
                     float iw = input.getWidth();
@@ -163,7 +106,7 @@ public class Main implements ApplicationListener {
                     Rectangle r = new Rectangle(ix, iy, iw, ih);
                     if (r.contains(touchPos.x, touchPos.y)) {
                         input.toggle();
-                        System.out.println("Input " + input.getLabel() + " -> " + input.getValue());
+                        //Gdx.app.log("Main.handleInput", "Input " + input.getLabel() + " -> " + input.getValue());
                     }
                 }
             }
@@ -197,6 +140,23 @@ public class Main implements ApplicationListener {
                 if (gate != null) gate.render(spriteBatch);
             }
             spriteBatch.end();
+
+            //checagem de vitoria
+            if (circuit.isCorrect()) {
+                Gdx.app.log("Main.draw", "Circuito correto! Nivel concluido.");
+                // trocar para o proximo nivel
+                levelIndex++;
+                if (levelIndex >= levels.size) {
+                    levelIndex = 0; // reinicia do primeiro nivel
+                }
+                currentLevel = levels.get(levelIndex);
+                circuit = currentLevel.getCircuit();
+                circuit.resetInputs();
+                wireRenderer = new com.badlogic.drop.ui.WireRenderer();
+                circuit.updateAllPos(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            }
+
+
         } else {
             // fallback: nao desenha nada de circuito
             spriteBatch.begin();

@@ -70,8 +70,6 @@ public final class Wire {
      */
     public void updateConnectionPoints() {
         // Por enquanto, usa o centro das portas
-        // TODO: ajustar para usar posições exatas dos pinos de entrada/saída (libGSX renderiza a partir do canto inferior esquerdo)
-
         // saida: coordenada X no meio da porta de origem (gate.X + width / 2)
         //        coordenada Y baseada da porta de origem - altura (gate.Y + height) - 30 para ficar "dentro"
         this.fromX = fromGate.getX() + fromGate.getWidth() / 2;
@@ -93,6 +91,8 @@ public final class Wire {
      *    distanciando-se proporcionalmente à sua posição X)
      * 3. Dobra verticalmente em direção à porta de destino
      * 4. Entra verticalmente na porta de destino
+     * Fios terão dobras mais próximas das portas de destino e vão descendo de acordo com a posição da porta de origem.
+     * Isso permite criar "grids" de linhas sem haver overlapping de fios.
      */
     protected void calculatePath() {
         pathPoints.clear();
@@ -100,26 +100,26 @@ public final class Wire {
         // Ponto inicial (saída da porta de origem)
         pathPoints.add(new Vector2(fromX, fromY));
         
-        // Determina qual elemento tem o Y menor (mais superior na tela)
+        // Determina qual elemento tem o Y maior (mais superior na tela)
         float referenceY;
         float referenceX;
 
-        if (fromY < toY) {
+        if (fromY > toY) {
             // Origem está mais superior
             referenceY = fromY;
-            referenceX = fromX;
+            referenceX = toX;
         } else {
             // Destino está mais superior (ou igual)
             referenceY = toY;
-            referenceX = toX;
+            referenceX = fromX;
         }
         
         // Altura do fio horizontal: parte do elemento mais superior
         // e soma proporcionalmente à sua posição X
-        // Fórmula: Yfio = Yref + distanciaBase + (Xref * fator)
+        // Fórmula: Yfio = Yref - distanciaBase - (Xref * fator)
         float baseDistance = 50f;
         float xFactor = 0.07f;
-        float horizontalY = referenceY + baseDistance + (referenceX * xFactor);
+        float horizontalY = referenceY - baseDistance - (referenceX * xFactor);
         
         // Ponto após sair verticalmente da origem
         pathPoints.add(new Vector2(fromX, horizontalY));

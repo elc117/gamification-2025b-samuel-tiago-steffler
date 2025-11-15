@@ -12,32 +12,38 @@ public class JSONtoCircuit {
     /* 
      * Retorna um Objeto Circuit a partir de um arquivo Json
      */
-    public Array<Level> convert(FileHandle file) {
+    public Array<Level> convert(FileHandle file, boolean debug) {
+        // array de niveis
         Array<Level> levelArr = new Array<>();
+        //leitura do arquivo JSON
+        //futuramente podemos fazert ele dar um fetch no repositorio online depois de upado para o itch.io
         String jsonStr = file.readString("UTF-8");
         JsonReader jsonReader = new JsonReader();
         JsonValue root = jsonReader.parse(jsonStr);
         JsonValue levels = root.get("levels");
         Gdx.app.log("JSONtoCircuit.convert", "Niveis encontrados: " + levels.size);
+
         for (JsonValue level : levels){
+            // novo circuito
             CircuitBuilder cir = new CircuitBuilder();
             int id = level.getInt("id");
-            Gdx.app.log("JSONtoCircuit.convert", "Nivel: " + id);
+            if(debug) Gdx.app.log("JSONtoCircuit.convert", "Circuito nivel: " + id);
+
             JsonValue inputsJson = level.get("inputs");
             for (JsonValue inputJson : inputsJson){
                 String label = inputJson.getString("label");
                 //boolean value = inputJson.getBoolean("value");
-                Gdx.app.log("JSONtoCircuit.convert", "Adicionando input: " + label + " com valor " + false);
+                //Gdx.app.log("JSONtoCircuit.convert", "Adicionando input: " + label + " com valor " + false);
                 cir.addInput(label, false);
             }
-            Gdx.app.log("JSONtoCircuit.convert", "Inputs adicionados: " + inputsJson.size);
+            if(debug) Gdx.app.log("JSONtoCircuit.convert", "Inputs adicionados: " + inputsJson.size);
 
             JsonValue outputsJson = level.get("outputs");
             for (JsonValue outputJson : outputsJson){
                 String label = outputJson.getString("label");
                 cir.addOutput(label);
             }
-            Gdx.app.log("JSONtoCircuit.convert", "Outputs adicionados: " + outputsJson.size);
+            if(debug) Gdx.app.log("JSONtoCircuit.convert", "Outputs adicionados: " + outputsJson.size);
             
             JsonValue gatesJson = level.get("gates");
             for (JsonValue gateJson : gatesJson){
@@ -79,30 +85,32 @@ public class JSONtoCircuit {
                     }
                 }
             }
-            Gdx.app.log("JSONtoCircuit.convert", "Gates adicionadas: " + gatesJson.size);
+            if(debug) Gdx.app.log("JSONtoCircuit.convert", "Gates adicionadas: " + gatesJson.size);
             
             for (JsonValue outs : outputsJson){
                 String inputLabel = outs.getString("input");
                 String outputLabel = outs.getString("label");
                 cir.addOutput(outputLabel, inputLabel);
             }
-            Gdx.app.log("JSONtoCircuit.convert", "Outputs conectados: " + outputsJson.size);
+            if(debug) Gdx.app.log("JSONtoCircuit.convert", "Outputs conectados: " + outputsJson.size);
 
-            Circuit levelCir = cir.build();
-            Gdx.app.log("JSONtoCircuit.convert", "Circuito do nivel " + id + " construido.");
-            /*
-            // Carrega a solucao esperada
+            Circuit levelCir = cir.build(debug);
+            if(debug) Gdx.app.log("JSONtoCircuit.convert", "Circuito do nivel " + id + " construido.");
+            if(debug) Gdx.app.log("JSONtoCircuit.convert", "Numero de outputs esperados no circuito: " + levelCir.getExpectedOutput().size);
+
+            // Carrega a solucao esperada (refatorar)
             JsonValue solutionJson = level.get("solution");
-            JsonValue valuesJson = solutionJson.get("values");
-            for (JsonValue outputValue : valuesJson){
+            for (JsonValue outputValue : solutionJson){
                 String outputLabel = outputValue.name();
+                if(debug) Gdx.app.log("JSONtoCircuit.convert", "Processando saida esperada: " + outputLabel);
                 boolean value = outputValue.asBoolean();
+                if(debug) Gdx.app.log("JSONtoCircuit.convert", "Definindo saida esperada: " + outputLabel + " = " + value);
                 levelCir.setExpectedOutput(outputLabel, value);
-                Gdx.app.log("JSONtoCircuit.convert", "Saida esperada definida: " + outputLabel + " = " + value);
-            }*/
+                if(debug) Gdx.app.log("JSONtoCircuit.convert", "Saida esperada definida: " + outputLabel + " = " + value);
+            }
             
             levelArr.add(new Level(id, levelCir));
-            Gdx.app.log("JSONtoCircuit.convert", "Circuito do nivel " + id + " adicionado à lista.");
+            if(debug) Gdx.app.log("JSONtoCircuit.convert", "Circuito do nivel " + id + " adicionado à lista.");
         }
         return levelArr;
     }
