@@ -17,6 +17,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -30,27 +31,29 @@ public class GameScreen implements Screen {
 
     private Texture backgroundTexture;
     private Image backgroundImage;
-    private Stage stage;
-
+    private final Stage stage;
+    private int moves;
     private final int levelId;
     private Level currentLevel;
     private Circuit circuit;
     private WireRenderer wireRenderer;
     private Viewport viewport;
-    private Vector2 touchPos;
-    private BitmapFont debugFont;
+    private final Vector2 touchPos;
+    private final BitmapFont debugFont;
     private LevelManager levelManager;
+    private final Label movesLabel;
+    private final MenuPopup menuPopup;
 
     public GameScreen(final BitItGame game, int levelId) {
         game.batch = new SpriteBatch();
         this.game = game;
         this.levelId = levelId;
-
+        this.moves = 0;
         Gdx.app.log("GameScreen", "Iniciando nivel " + (levelId + 1));
 
         // Carrega texturas
         try {
-            backgroundTexture = new Texture(Gdx.files.internal("textures/UI/bkgdark.png"));
+            backgroundTexture = new Texture(Gdx.files.internal("textures/UI/gamescreen.png"));
             backgroundImage = new Image(backgroundTexture);
             backgroundImage.setScale(0.5f);
         } catch (Exception e) {
@@ -62,7 +65,7 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.15f, 0);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // Cria viewport
+        // Viewport
         stage = new Stage(new FitViewport(BitItGame.VIRTUAL_WIDTH, BitItGame.VIRTUAL_HEIGHT));
         backgroundImage = new Image(backgroundTexture);
         backgroundImage.setFillParent(true);
@@ -70,10 +73,28 @@ public class GameScreen implements Screen {
         
         touchPos = new Vector2();
 
-        // Cria fonte para debug
+        // fonte para debug
         debugFont = new BitmapFont();
         debugFont.setColor(Color.WHITE);
         debugFont.getData().setScale(1.5f);
+
+        // label de movimentos
+        movesLabel = new Label("Moves: 0", new Label.LabelStyle(debugFont, Color.WHITE));
+        movesLabel.setPosition(10, BitItGame.VIRTUAL_HEIGHT - 40);
+        stage.addActor(movesLabel);
+
+        // menu popup
+        menuPopup = new MenuPopup(stage, BitItGame.VIRTUAL_WIDTH, BitItGame.VIRTUAL_HEIGHT);
+        menuPopup.setRestartListener(() -> {
+            // tripa grande da poxa pra resetar input
+            circuit.resetInputs();
+            game.setScreen(new GameScreen(game, levelId));
+        });
+        menuPopup.setHomeListener(() -> {
+            int levelPage = levelId / 6;
+            circuit.resetInputs();
+            game.setScreen(new LevelsScreen(game, levelPage));
+        });
 
         // Carrega o nivel
         loadLevel(levelId);
@@ -129,20 +150,29 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.15f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         
+        // Atualiza o texto
+        movesLabel.setText("Moves: " + moves);
+        
         viewport = stage.getViewport();
         handleInput();
         
-        // Desenha o stage (background)
+        // Update stage actors
         stage.act(Math.min(delta, 1 / 30f));
-        stage.draw();
         
+        // Draw only the background (not the whole stage yet)
         viewport.apply();
         game.batch.setProjectionMatrix(viewport.getCamera().combined);
+        game.batch.begin();
+        backgroundImage.draw(game.batch, 1);
+        game.batch.end();
 
         if (circuit != null) {
-            // Avalia o circuito
-            circuit.evaluate();
+            // Only evaluate if menu is not visible (pause game logic)
+            if (menuPopup == null || !menuPopup.isVisible()) {
+                circuit.evaluate();
+            }
 
+            // Draw circuit on top of background
             // Desenha fios
             if (wireRenderer != null) {
                 wireRenderer.getShapeRenderer().setProjectionMatrix(viewport.getCamera().combined);
@@ -156,6 +186,16 @@ public class GameScreen implements Screen {
             }
             game.batch.end();
         }
+        
+        // desenhar menu
+        if (menuPopup != null && menuPopup.isVisible()) {
+            menuPopup.draw();
+        }
+        
+        // desenhar labels da UI
+        game.batch.begin();
+        movesLabel.draw(game.batch, 1);
+        game.batch.end();
 
         // Desenha informações de debug
         // game.batch.begin();
@@ -169,13 +209,18 @@ public class GameScreen implements Screen {
      * Gerencia entrada do usuario
      */
     private void handleInput() {
-        // Volta para tela de niveis ao pressionar ESC
+        // liga o menu com esc
         if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.ESCAPE)) {
-            int levelPage = levelId / 6; // LEVELS_PER_PAGE = 6
-            game.setScreen(new LevelsScreen(game, levelPage));
-            dispose();
+            if (menuPopup != null) {
+                menuPopup.toggle();
+            }
             return;
         }
+        // nao interagir com o toque com menu abertp
+        if (menuPopup != null && menuPopup.isVisible()) {
+            return;
+        }
+
 
         // Detecta clique/toque nos inputs
         if (Gdx.input.justTouched() && circuit != null) {
@@ -184,6 +229,15 @@ public class GameScreen implements Screen {
 
             //Gdx.app.log("GameScreen", "Clique em: (" + (int)touchPos.x + ", " + (int)touchPos.y + ")");
 
+            // topo superior direito
+            if (touchPos.x > BitItGame.VIRTUAL_WIDTH - 200 && touchPos.y > BitItGame.VIRTUAL_HEIGHT - 200) {
+                if (menuPopup != null) {
+                    Gdx.app.log("GameScreen", "Menu clicado");
+                    menuPopup.toggle();
+                }
+                return;
+            }
+
             // Verifica se clicou em algum input bit
             Array<InputBits> inputs = circuit.getInputs();
             for (InputBits input : inputs) {
@@ -191,6 +245,7 @@ public class GameScreen implements Screen {
                                                  input.getWidth(), input.getHeight());
                 if (bounds.contains(touchPos.x, touchPos.y)) {
                     input.toggle();
+                    moves++;
                     Gdx.app.log("GameScreen", "Input " + input.getLabel() + " -> " + input.getValue());
                 }
             }
@@ -225,8 +280,9 @@ public class GameScreen implements Screen {
                     }
                     //dispose();
                     
-                    int levelPage = (levelId < levelManager.getTotalLevels() - 1 ? levelId + 1 : levelId) / 6; // LEVELS_PER_PAGE = 6
-                    game.setScreen(new LevelsScreen(game, levelPage));
+                    //int levelPage = (levelId < levelManager.getTotalLevels() - 1 ? levelId + 1 : levelId) / 6; // LEVELS_PER_PAGE = 6
+                    //game.setScreen(new LevelsScreen(game, levelPage));
+                    game.setScreen(new CompleteGame(game, this));
                 }
 
 
@@ -257,8 +313,9 @@ public class GameScreen implements Screen {
         if (wireRenderer != null) wireRenderer.dispose();
         if (debugFont != null) debugFont.dispose();
         if (game.batch != null) game.batch.dispose();
+        if (menuPopup != null) menuPopup.dispose();
 
-        // Dispose textures owned by gates
+        // texturas dos gates
         if (circuit != null) {
             for (com.badlogic.drop.entities.gates.LogicGate gate : circuit.getAllGates()) {
                 if (gate != null) gate.dispose();
