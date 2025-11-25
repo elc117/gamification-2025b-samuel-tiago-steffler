@@ -12,6 +12,7 @@ public class Level {
     private boolean completed;
     private boolean unlocked;
     private int stars = 0;
+    private int minMoves = 1; // Número mínimo de movimentos para 3 estrelas
    
     public Level(int id, Circuit circuit) {
         this.id = id;
@@ -48,5 +49,13 @@ public class Level {
 
     public void setStars(int stars) {
         this.stars = stars;
+    }
+    
+    public int getMinMoves() {
+        return minMoves;
+    }
+    
+    public void setMinMoves(int minMoves) {
+        this.minMoves = minMoves;
     }
 }

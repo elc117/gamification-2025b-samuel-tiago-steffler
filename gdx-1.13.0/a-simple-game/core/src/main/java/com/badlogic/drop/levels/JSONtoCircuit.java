@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
 public class JSONtoCircuit {
-    /* 
+    /*
      * Retorna um Objeto Circuit a partir de um arquivo Json
      */
     public Array<Level> convert(FileHandle file, boolean debug) {
@@ -44,7 +44,7 @@ public class JSONtoCircuit {
                 cir.addOutput(label);
             }
             if(debug) Gdx.app.log("JSONtoCircuit.convert", "Outputs adicionados: " + outputsJson.size);
-            
+
             JsonValue gatesJson = level.get("gates");
             for (JsonValue gateJson : gatesJson){
                 String type = gateJson.getString("type");
@@ -78,7 +78,7 @@ public class JSONtoCircuit {
                 JsonValue inputsObj = gateJson.get("inputs");
                 if (inputsObj != null) {
                     for (JsonValue inputEntry : inputsObj) {
-                        String indexName = inputEntry.name(); 
+                        String indexName = inputEntry.name();
                         int inputIndex = Integer.parseInt(indexName);
                         String inputLabel = inputEntry.asString();
                         cir.connect(inputLabel, label, inputIndex);
@@ -86,7 +86,7 @@ public class JSONtoCircuit {
                 }
             }
             if(debug) Gdx.app.log("JSONtoCircuit.convert", "Gates adicionadas: " + gatesJson.size);
-            
+
             for (JsonValue outs : outputsJson){
                 String inputLabel = outs.getString("input");
                 String outputLabel = outs.getString("label");
@@ -108,8 +108,14 @@ public class JSONtoCircuit {
                 levelCir.setExpectedOutput(outputLabel, value);
                 if(debug) Gdx.app.log("JSONtoCircuit.convert", "Saida esperada definida: " + outputLabel + " = " + value);
             }
-            
-            levelArr.add(new Level(id, levelCir));
+
+            // Cria o nivel e define minMoves se especificado no JSON
+            Level newLevel = new Level(id, levelCir);
+            int minMoves = level.getInt("minMoves", 1); // Padrão 1 se não especificado
+            newLevel.setMinMoves(minMoves);
+            if(debug) Gdx.app.log("JSONtoCircuit.convert", "minMoves do nivel " + id + ": " + minMoves);
+
+            levelArr.add(newLevel);
             if(debug) Gdx.app.log("JSONtoCircuit.convert", "Circuito do nivel " + id + " adicionado à lista.");
         }
         return levelArr;

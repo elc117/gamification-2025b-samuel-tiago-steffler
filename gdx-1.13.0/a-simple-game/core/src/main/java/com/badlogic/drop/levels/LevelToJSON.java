@@ -1,4 +1,4 @@
-package com.badlogic.drop.levels;
+ package com.badlogic.drop.levels;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -55,17 +55,6 @@ public class LevelToJSON {
     }
 
     /*
-     * Estrutura da solucao (valores esperados das saidas)
-     */
-    private static class Solution {
-        public ObjectMap<String, Boolean> values;
-
-        public Solution(ObjectMap<String, Boolean> values) {
-            this.values = values;
-        }
-    }
-
-    /*
      * Estrutura do nivel completo
      */
     private static class Level {
@@ -73,14 +62,16 @@ public class LevelToJSON {
         public List<Input> inputs;
         public List<Gate> gates;
         public List<Output> outputs;
-        public Solution solution;
+        public ObjectMap<String, Boolean> solution; // Mudado para usar ObjectMap diretamente
+        public int minMoves;
 
-        public Level(int id, List<Input> inputs, List<Gate> gates, List<Output> outputs, Solution solution) {
+        public Level(int id, List<Input> inputs, List<Gate> gates, List<Output> outputs, ObjectMap<String, Boolean> solution, int minMoves) {
             this.id = id;
             this.inputs = inputs;
             this.gates = gates;
             this.outputs = outputs;
             this.solution = solution;
+            this.minMoves = minMoves;
         }
     }
 
@@ -152,10 +143,20 @@ public class LevelToJSON {
             allInputs = new TreeSet<>();
             gates = new ArrayList<>();
 
-            // Separa circuitos da solucao usando "-"
+            // Separa circuitos da solucao e minMoves usando "-"
+            // Formato: <expressao>-<bits de saida esperados>-<minimo de movimentos>
             String[] lineParts = line.split("-");
             String circuitsPart = lineParts[0].trim();
             String solutionPart = lineParts.length > 1 ? lineParts[1].trim() : "";
+            String minMovesPart = lineParts.length > 2 ? lineParts[2].trim() : "1";
+
+            // Parse minMoves (padrão 1 se não especificado)
+            int minMoves = 1;
+            try {
+                minMoves = Integer.parseInt(minMovesPart);
+            } catch (NumberFormatException e) {
+                System.err.println("Aviso: minMoves invalido no nivel " + levelId + ", usando padrao 1");
+            }
 
             // Tokenizacao por ponto e virgula (separa circuitos/saidas)
             String[] circuits = circuitsPart.split(";");
@@ -182,9 +183,9 @@ public class LevelToJSON {
             }
 
             // Cria a solucao
-            Solution solution = parseSolution(solutionPart, outputs.size());
+            ObjectMap<String, Boolean> solution = parseSolution(solutionPart, outputs.size());
 
-            levels.add(new Level(levelId++, inputs, new ArrayList<>(gates), outputs, solution));
+            levels.add(new Level(levelId++, inputs, new ArrayList<>(gates), outputs, solution, minMoves));
         }
 
         return levels;
@@ -244,7 +245,7 @@ public class LevelToJSON {
      * Faz o parsing da solucao (valores esperados das saidas)
      * Formato: "1,0,1" significa X0=true, X1=false, X2=true
      */
-    private Solution parseSolution(String solutionString, int numOutputs) {
+    private ObjectMap<String, Boolean> parseSolution(String solutionString, int numOutputs) {
         ObjectMap<String, Boolean> values = new ObjectMap<>();
 
         if (solutionString.isEmpty()) {
@@ -259,7 +260,7 @@ public class LevelToJSON {
             values.put("X" + i, boolValue);
         }
 
-        return new Solution(values);
+        return values;
     }
 
     /**
@@ -293,7 +294,7 @@ public class LevelToJSON {
     }
 
     /**
-     * Versao standalone que nao depende do contexto libGDX
+     * Versao standalone que nao depende do contexto libGDX para executar na raiz do projeto
      * Usa Java IO padrao para ler e escrever arquivos
      */
     public void convertLevelsToJSONStandalone(String inputPath, String outputPath) throws IOException {
