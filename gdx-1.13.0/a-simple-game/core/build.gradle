@@ -4,3 +4,12 @@ eclipse.project.name = appName + '-core'
 dependencies {
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
 }
+
+// Task para executar o conversor de níveis
+task convertLevels(type: JavaExec) {
+    description = 'Converte levels.txt para levels.json'
+    group = 'application'
+    mainClass = 'com.badlogic.drop.levels.LevelToJSON'
+    classpath = sourceSets.main.runtimeClasspath
+    workingDir = project.file('../')
+}

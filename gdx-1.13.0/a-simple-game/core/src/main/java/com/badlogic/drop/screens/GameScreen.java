@@ -5,6 +5,7 @@ import com.badlogic.drop.entities.Circuit;
 import com.badlogic.drop.entities.gates.InputBits;
 import com.badlogic.drop.levels.Level;
 import com.badlogic.drop.levels.LevelManager;
+import com.badlogic.drop.levels.LevelProgress;
 import com.badlogic.drop.ui.WireRenderer;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -32,17 +33,25 @@ public class GameScreen implements Screen {
     private Texture backgroundTexture;
     private Image backgroundImage;
     private final Stage stage;
+
     private int moves;
     private final int levelId;
     private Level currentLevel;
+
     private Circuit circuit;
     private WireRenderer wireRenderer;
     private Viewport viewport;
+    private LevelManager levelManager;
+
     private final Vector2 touchPos;
     private final BitmapFont debugFont;
-    private LevelManager levelManager;
     private final Label movesLabel;
+
     private final MenuPopup menuPopup;
+    private final LevelCompletePopUp levelupPopup;
+
+    private boolean levelCompleted = false;
+    private boolean firstMove = false;
 
     public GameScreen(final BitItGame game, int levelId) {
         game.batch = new SpriteBatch();
@@ -70,7 +79,7 @@ public class GameScreen implements Screen {
         backgroundImage = new Image(backgroundTexture);
         backgroundImage.setFillParent(true);
         stage.addActor(backgroundImage);
-        
+
         touchPos = new Vector2();
 
         // fonte para debug
@@ -85,19 +94,45 @@ public class GameScreen implements Screen {
 
         // menu popup
         menuPopup = new MenuPopup(stage, BitItGame.VIRTUAL_WIDTH, BitItGame.VIRTUAL_HEIGHT);
+
+        // levelup popup
+        levelupPopup = new LevelCompletePopUp(stage, BitItGame.VIRTUAL_WIDTH, BitItGame.VIRTUAL_HEIGHT);
+
+        // Carrega o nivel
+        loadLevel(levelId);
+
+        // Configuracao dos listeners
+        // Menu de pause
         menuPopup.setRestartListener(() -> {
-            // tripa grande da poxa pra resetar input
-            circuit.resetInputs();
+            if (circuit != null) circuit.resetInputs();
             game.setScreen(new GameScreen(game, levelId));
         });
         menuPopup.setHomeListener(() -> {
             int levelPage = levelId / 6;
-            circuit.resetInputs();
+            if (circuit != null) circuit.resetInputs();
             game.setScreen(new LevelsScreen(game, levelPage));
         });
 
-        // Carrega o nivel
-        loadLevel(levelId);
+        // Menu de level complete
+        levelupPopup.setRestartListener(() -> {
+            if (circuit != null) circuit.resetInputs();
+            game.setScreen(new GameScreen(game, levelId));
+        });
+        levelupPopup.setNextLevelListener(() -> {
+            if (circuit != null) circuit.resetInputs();
+            // vai para proximo nivel se houver, senao vai para a pagina de niveis
+            if (levelId + 1 < levelManager.getTotalLevels()) {
+                game.setScreen(new GameScreen(game, levelId + 1));
+            } else {
+                int levelPage = levelId / 6;
+                game.setScreen(new LevelsScreen(game, levelPage));
+            }
+        });
+        levelupPopup.setLevelMenuListener(() -> {
+            int levelPage = levelId / 6;
+            if (circuit != null) circuit.resetInputs();
+            game.setScreen(new LevelsScreen(game, levelPage));
+        });
     }
 
     /**
@@ -113,18 +148,18 @@ public class GameScreen implements Screen {
                 Gdx.app.log("GameScreen", "Carregando nivel " + (levelId + 1));
                 circuit = currentLevel.getCircuit();
 
-                // Atualiza posições dos elementos do circuito
+                circuit.resetInputs();
+
                 circuit.updateAllPos((int)BitItGame.VIRTUAL_WIDTH, (int)BitItGame.VIRTUAL_HEIGHT);
-                
-                //game.batch.setProjectionMatrix(viewport.getCamera().combined);
+
                 // Cria renderizador de fios
                 if (wireRenderer == null) {
                     wireRenderer = new WireRenderer();
                 }
-                //wireRenderer.getShapeRenderer().setProjectionMatrix(viewport.getCamera().combined);
+
                 wireRenderer.renderAll(circuit.getWires());
                 //carrega sprites das portas
-                game.batch.begin();           
+                game.batch.begin();
                 for (com.badlogic.drop.entities.gates.LogicGate gate : circuit.getAllGates()) {
                     if (gate != null) gate.render(game.batch);
                 }
@@ -149,17 +184,15 @@ public class GameScreen implements Screen {
         // Limpa tela
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.15f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        
+
         // Atualiza o texto
         movesLabel.setText("Moves: " + moves);
-        
+
         viewport = stage.getViewport();
         handleInput();
-        
-        // Update stage actors
         stage.act(Math.min(delta, 1 / 30f));
-        
-        // Draw only the background (not the whole stage yet)
+
+        // desenha background
         viewport.apply();
         game.batch.setProjectionMatrix(viewport.getCamera().combined);
         game.batch.begin();
@@ -167,12 +200,12 @@ public class GameScreen implements Screen {
         game.batch.end();
 
         if (circuit != null) {
-            // Only evaluate if menu is not visible (pause game logic)
-            if (menuPopup == null || !menuPopup.isVisible()) {
+            // evita evaluacao quando ha popup aberto
+            if ((menuPopup == null || !menuPopup.isVisible()) &&
+                (levelupPopup == null || !levelupPopup.isVisible())) {
                 circuit.evaluate();
             }
 
-            // Draw circuit on top of background
             // Desenha fios
             if (wireRenderer != null) {
                 wireRenderer.getShapeRenderer().setProjectionMatrix(viewport.getCamera().combined);
@@ -186,12 +219,17 @@ public class GameScreen implements Screen {
             }
             game.batch.end();
         }
-        
+
         // desenhar menu
         if (menuPopup != null && menuPopup.isVisible()) {
             menuPopup.draw();
         }
-        
+
+        // desenhar popup de level up
+        if (levelupPopup != null && levelupPopup.isVisible()) {
+            levelupPopup.draw();
+        }
+
         // desenhar labels da UI
         game.batch.begin();
         movesLabel.draw(game.batch, 1);
@@ -209,6 +247,11 @@ public class GameScreen implements Screen {
      * Gerencia entrada do usuario
      */
     private void handleInput() {
+        // Bloquear todas as entradas se o popup de level up estiver visível
+        if (levelupPopup != null && levelupPopup.isVisible()) {
+            return;
+        }
+
         // liga o menu com esc
         if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.ESCAPE)) {
             if (menuPopup != null) {
@@ -246,10 +289,11 @@ public class GameScreen implements Screen {
                 if (bounds.contains(touchPos.x, touchPos.y)) {
                     input.toggle();
                     moves++;
+                    firstMove = true;
                     Gdx.app.log("GameScreen", "Input " + input.getLabel() + " -> " + input.getValue());
                 }
             }
-            
+
             // verificacao do circuito depois de clique
             if (circuit != null) {
                 // primeiramente calcula todos os valores do circuito
@@ -257,7 +301,6 @@ public class GameScreen implements Screen {
 
                 // primeiro fios
                 if (wireRenderer != null) {
-                    // Ensure shapeRenderer uses same projection
                     wireRenderer.getShapeRenderer().setProjectionMatrix(viewport.getCamera().combined);
                     wireRenderer.renderAll(circuit.getWires());
                 }
@@ -268,25 +311,51 @@ public class GameScreen implements Screen {
                     if (gate != null) gate.render(game.batch);
                 }
                 game.batch.end();
-                //checagem de vitoria
-                if (circuit.isCorrect()) {
-                    Gdx.app.log("Main.draw", "Circuito correto! Nivel " + (levelId + 1) + " concluido.");
-                    // voltar para a tela inicial e atualizar estado de jogos
-                    circuit.resetInputs();
-                    levelManager.getLevel(levelId).setCompleted(true);
-                    levelManager.getLevel(levelId).setStars(3);
-                    if (levelId + 1 < levelManager.getTotalLevels()) {
-                        levelManager.getLevel(levelId + 1).setUnlocked(true);
-                    }
-                    //dispose();
-                    
-                    //int levelPage = (levelId < levelManager.getTotalLevels() - 1 ? levelId + 1 : levelId) / 6; // LEVELS_PER_PAGE = 6
-                    //game.setScreen(new LevelsScreen(game, levelPage));
-                    game.setScreen(new CompleteGame(game, this));
-                }
-
-
             }
+        }
+
+        // Verificação de vitoria
+        if (circuit != null && !levelCompleted && firstMove && circuit.isCorrect()) {
+            levelCompleted = true;
+            Gdx.app.log("GameScreen", "Circuito correto! Nivel " + (levelId + 1) + " concluido.");
+
+            // Calcula estrelas baseado no numero de movimentos e minMoves do nivel
+            int minMoves = currentLevel.getMinMoves();
+            int stars = calculateStars(moves, minMoves);
+            Gdx.app.log("GameScreen", "Estrelas: " + stars + " (moves: " + moves + ", minMoves: " + minMoves + ")");
+
+            // Atualiza progresso do nivel usando LevelProgress
+            LevelProgress levelProgress = LevelProgress.getInstance();
+            levelProgress.setLevelCompleted(levelId, true);
+
+            // atualiza dados do nivel atual no LevelManager
+            levelManager.getLevel(levelId).setCompleted(true);
+            levelManager.getLevel(levelId).setStars(stars);
+            if (levelId + 1 < levelManager.getTotalLevels()) {
+                levelManager.getLevel(levelId + 1).setUnlocked(true);
+            }
+
+            // Mostra popup de nivel completo com estrelas
+            if (levelupPopup != null) {
+                levelupPopup.setStars(stars);
+                levelupPopup.show();
+            }
+        }
+    }
+
+    /**
+     * Calcula o número de estrelas baseado nos movimentos
+     * 3 estrelas: moves == minMoves (solução perfeita)
+     * 2 estrelas: moves == minMoves + 1
+     * 1 estrela: acima disso
+     */
+    private int calculateStars(int moves, int minMoves) {
+        if (moves == minMoves) {
+            return 3;
+        } else if (moves == minMoves + 2) {
+            return 2;
+        } else {
+            return 1;
         }
     }
 

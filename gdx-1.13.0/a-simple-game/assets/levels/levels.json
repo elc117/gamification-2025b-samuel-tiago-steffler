@@ -28,7 +28,8 @@
 		],
 		"solution": {
 			"X0": true
-		}
+		},
+		"minMoves": 2
 	},
 	{
 		"id": 2,
@@ -69,7 +70,8 @@
 		],
 		"solution": {
 			"X0": true
-		}
+		},
+		"minMoves": 1
 	},
 	{
 		"id": 3,
@@ -117,7 +119,8 @@
 		],
 		"solution": {
 			"X0": true
-		}
+		},
+		"minMoves": 1
 	},
 	{
 		"id": 4,
@@ -173,7 +176,8 @@
 		],
 		"solution": {
 			"X0": true
-		}
+		},
+		"minMoves": 1
 	},
 	{
 		"id": 5,
@@ -245,7 +249,8 @@
 		],
 		"solution": {
 			"X0": true
-		}
+		},
+		"minMoves": 2
 	},
 	{
 		"id": 6,
@@ -308,7 +313,8 @@
 		],
 		"solution": {
 			"X0": true
-		}
+		},
+		"minMoves": 2
 	},
 	{
 		"id": 7,
@@ -395,7 +401,8 @@
 		"solution": {
 			"X1": true,
 			"X0": true
-		}
+		},
+		"minMoves": 3
 	},
 	{
 		"id": 8,
@@ -497,7 +504,8 @@
 		"solution": {
 			"X1": true,
 			"X0": true
-		}
+		},
+		"minMoves": 2
 	},
 	{
 		"id": 9,
@@ -554,7 +562,8 @@
 		],
 		"solution": {
 			"X0": true
-		}
+		},
+		"minMoves": 2
 	},
 	{
 		"id": 10,
@@ -611,7 +620,8 @@
 		],
 		"solution": {
 			"X0": true
-		}
+		},
+		"minMoves": 1
 	},
 	{
 		"id": 11,
@@ -686,7 +696,8 @@
 		],
 		"solution": {
 			"X0": true
-		}
+		},
+		"minMoves": 1
 	},
 	{
 		"id": 12,
@@ -781,7 +792,8 @@
 		"solution": {
 			"X1": true,
 			"X0": true
-		}
+		},
+		"minMoves": 3
 	}
 ]
 }
