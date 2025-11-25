@@ -96,6 +96,27 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ### Documentação
 
 - Atualização do CHANGELOG.md com as mudanças realizadas
+
+
+## [0.6.0] - 2025-11-23
+
+### Adicionado
+
+- Menus de pause e de nível concluído
+
+### Modificado
+
+- Refatoração na tela de jogo (GameScreen) para adicionar verificação de vitória e cálculo de estrelas
+- Refatoração do LevelManager para atualizar o progresso do nível corretamente
+- Refatoração do LevelToJSON para adicionar versão standalone do conversor de níveis
+
+### Corrigido
+
+- Correções mínimas em bugs
+
+### Documentação
+
+- Atualização do CHANGELOG.md com as mudanças realizadas
 ---
 
 <!--
@@ -126,3 +147,4 @@ links:
 [0.3.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v0.3.0
 [0.4.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v0.4.0
 [0.5.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v0.5.0
+[0.6.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v0.6.0
