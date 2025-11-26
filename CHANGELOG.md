@@ -117,6 +117,32 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ### Documentação
 
 - Atualização do CHANGELOG.md com as mudanças realizadas
+  
+
+## [1.0.0] - 2025-11-26
+
+Realease inicial do jogo "Bit it!" com todas as funcionalidades planejadas implementadas.
+
+### Adicionado
+
+- Menu de créditos e de como jogar
+- Menu de níveis com pontuação por estrelas aparente
+
+### Modificado
+
+- Refatoração para adicionar novos níveis e balancear a dificuldade
+- Modificação na tela inicial do jogo
+
+### Corrigido
+
+- Correções mínimas em bugs
+
+### Documentação
+
+- Finalização do README.md
+- Atualização do CHANGELOG.md com as mudanças realizadas
+- Criação do Diagrama de Classes UML
+
 ---
 
 <!--
@@ -148,3 +174,4 @@ links:
 [0.4.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v0.4.0
 [0.5.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v0.5.0
 [0.6.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v0.6.0
+[1.0.0]: https://github.com/elc117/gamification-2025b-samuel-tiago-steffler/releases/tag/v1.0.0

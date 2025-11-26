@@ -52,7 +52,7 @@ public class MenuScreen implements Screen {
         float playBtnHeight = playButtonTexture.getHeight();
         float scale = 0.5f;
 
-        // Configura botao de hot to play
+        // Configura botao de how to play
         ImageButton.ImageButtonStyle howToPlayButtonStyle = new ImageButton.ImageButtonStyle();
         howToPlayButtonStyle.imageUp = new TextureRegionDrawable(howToPlayTexture);
         final ImageButton howPlayButton = new ImageButton(howToPlayButtonStyle);
@@ -81,8 +81,8 @@ public class MenuScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Gdx.app.log("MenuScreen", "Botao how to play clicado em: " + x + ", " + y);
-                //game.setScreen(new LevelsScreen(game));
-                //dispose();
+                game.setScreen(new HowToPlayScreen(game));
+                dispose();
             }
         });
 
@@ -91,8 +91,8 @@ public class MenuScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Gdx.app.log("MenuScreen", "Botao creditos clicado em: " + x + ", " + y);
-                //game.setScreen(new LevelsScreen(game));
-                //dispose();
+                game.setScreen(new CreditsScreen(game));
+                dispose();
             }
         });
 
@@ -100,6 +100,9 @@ public class MenuScreen implements Screen {
         playButton.setSize(playBtnWidth * scale, playBtnHeight * scale);
         playButton.setPosition((BitItGame.VIRTUAL_WIDTH - playBtnWidth * scale) / 2,  252);
         stage.addActor(playButton);
+        howPlayButton.setSize(howPlayBtnWidth * scale, howPlayBtnHeight * scale);
+        howPlayButton.setPosition((BitItGame.VIRTUAL_WIDTH - howPlayBtnWidth * scale) / 2 + 35, 165);
+        stage.addActor(howPlayButton);
         creditsButton.setSize(creditBtnWidth * scale, creditBtnHeight * scale);
         creditsButton.setPosition((BitItGame.VIRTUAL_WIDTH - creditBtnWidth * scale) / 2 + 70, 78);
         stage.addActor(creditsButton);
