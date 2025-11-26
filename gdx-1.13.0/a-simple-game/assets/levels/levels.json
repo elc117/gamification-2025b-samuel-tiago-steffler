@@ -47,7 +47,57 @@
 		"gates": [
 			{
 				"label": "0",
-				"type": "OR",
+				"type": "AND",
+				"inputs": {
+					"1": "I1",
+					"0": "I0"
+				}
+			},
+			{
+				"label": "1",
+				"type": "AND",
+				"inputs": {
+					"1": "I2",
+					"0": "I1"
+				}
+			},
+			{
+				"label": "2",
+				"type": "AND",
+				"inputs": {
+					"1": "1",
+					"0": "0"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"label": "X0",
+				"input": "2"
+			}
+		],
+		"solution": {
+			"X0": true
+		},
+		"minMoves": 3
+	},
+	{
+		"id": 3,
+		"inputs": [
+			{
+				"label": "I0"
+			},
+			{
+				"label": "I1"
+			},
+			{
+				"label": "I2"
+			}
+		],
+		"gates": [
+			{
+				"label": "0",
+				"type": "AND",
 				"inputs": {
 					"1": "I2",
 					"0": "I1"
@@ -74,7 +124,7 @@
 		"minMoves": 1
 	},
 	{
-		"id": 3,
+		"id": 4,
 		"inputs": [
 			{
 				"label": "I0"
@@ -89,17 +139,17 @@
 		"gates": [
 			{
 				"label": "0",
-				"type": "OR",
+				"type": "NOT",
 				"inputs": {
-					"1": "I2",
-					"0": "I1"
+					"0": "I0"
 				}
 			},
 			{
 				"label": "1",
-				"type": "NOT",
+				"type": "OR",
 				"inputs": {
-					"0": "I0"
+					"1": "I2",
+					"0": "I1"
 				}
 			},
 			{
@@ -123,63 +173,6 @@
 		"minMoves": 1
 	},
 	{
-		"id": 4,
-		"inputs": [
-			{
-				"label": "I0"
-			},
-			{
-				"label": "I1"
-			},
-			{
-				"label": "I2"
-			}
-		],
-		"gates": [
-			{
-				"label": "0",
-				"type": "OR",
-				"inputs": {
-					"1": "I2",
-					"0": "I0"
-				}
-			},
-			{
-				"label": "1",
-				"type": "AND",
-				"inputs": {
-					"1": "I2",
-					"0": "I1"
-				}
-			},
-			{
-				"label": "2",
-				"type": "NOT",
-				"inputs": {
-					"0": "1"
-				}
-			},
-			{
-				"label": "3",
-				"type": "AND",
-				"inputs": {
-					"1": "2",
-					"0": "0"
-				}
-			}
-		],
-		"outputs": [
-			{
-				"label": "X0",
-				"input": "3"
-			}
-		],
-		"solution": {
-			"X0": true
-		},
-		"minMoves": 1
-	},
-	{
 		"id": 5,
 		"inputs": [
 			{
@@ -187,16 +180,14 @@
 			},
 			{
 				"label": "I1"
-			},
-			{
-				"label": "I2"
 			}
 		],
 		"gates": [
 			{
 				"label": "0",
-				"type": "NOT",
+				"type": "XNOR",
 				"inputs": {
+					"1": "I1",
 					"0": "I0"
 				}
 			},
@@ -204,47 +195,15 @@
 				"label": "1",
 				"type": "AND",
 				"inputs": {
-					"1": "I2",
-					"0": "I1"
-				}
-			},
-			{
-				"label": "2",
-				"type": "AND",
-				"inputs": {
-					"1": "1",
-					"0": "0"
-				}
-			},
-			{
-				"label": "3",
-				"type": "AND",
-				"inputs": {
-					"1": "I2",
+					"1": "0",
 					"0": "I0"
-				}
-			},
-			{
-				"label": "4",
-				"type": "OR",
-				"inputs": {
-					"1": "I1",
-					"0": "3"
-				}
-			},
-			{
-				"label": "5",
-				"type": "AND",
-				"inputs": {
-					"1": "4",
-					"0": "2"
 				}
 			}
 		],
 		"outputs": [
 			{
 				"label": "X0",
-				"input": "5"
+				"input": "1"
 			}
 		],
 		"solution": {
@@ -263,6 +222,9 @@
 			},
 			{
 				"label": "I2"
+			},
+			{
+				"label": "I3"
 			}
 		],
 		"gates": [
@@ -270,38 +232,40 @@
 				"label": "0",
 				"type": "AND",
 				"inputs": {
-					"1": "I2",
-					"0": "I1"
-				}
-			},
-			{
-				"label": "1",
-				"type": "AND",
-				"inputs": {
 					"1": "I1",
 					"0": "I0"
 				}
 			},
 			{
-				"label": "2",
-				"type": "NOT",
+				"label": "1",
+				"type": "OR",
 				"inputs": {
-					"0": "1"
+					"1": "I3",
+					"0": "I2"
 				}
 			},
 			{
-				"label": "3",
-				"type": "OR",
+				"label": "2",
+				"type": "XNOR",
 				"inputs": {
-					"1": "2",
+					"1": "1",
 					"0": "0"
 				}
 			},
 			{
-				"label": "4",
-				"type": "NOT",
+				"label": "3",
+				"type": "NOR",
 				"inputs": {
-					"0": "3"
+					"1": "I3",
+					"0": "1"
+				}
+			},
+			{
+				"label": "4",
+				"type": "XOR",
+				"inputs": {
+					"1": "3",
+					"0": "2"
 				}
 			}
 		],
@@ -327,9 +291,6 @@
 			},
 			{
 				"label": "I2"
-			},
-			{
-				"label": "I3"
 			}
 		],
 		"gates": [
@@ -338,21 +299,22 @@
 				"type": "OR",
 				"inputs": {
 					"1": "I2",
-					"0": "I1"
+					"0": "I0"
 				}
 			},
 			{
 				"label": "1",
-				"type": "NOT",
+				"type": "AND",
 				"inputs": {
-					"0": "0"
+					"1": "I2",
+					"0": "I1"
 				}
 			},
 			{
 				"label": "2",
 				"type": "NOT",
 				"inputs": {
-					"0": "I2"
+					"0": "1"
 				}
 			},
 			{
@@ -360,49 +322,20 @@
 				"type": "AND",
 				"inputs": {
 					"1": "2",
-					"0": "I0"
-				}
-			},
-			{
-				"label": "4",
-				"type": "OR",
-				"inputs": {
-					"1": "3",
-					"0": "1"
-				}
-			},
-			{
-				"label": "5",
-				"type": "OR",
-				"inputs": {
-					"1": "I3",
-					"0": "I2"
-				}
-			},
-			{
-				"label": "6",
-				"type": "AND",
-				"inputs": {
-					"1": "0",
-					"0": "5"
+					"0": "0"
 				}
 			}
 		],
 		"outputs": [
 			{
 				"label": "X0",
-				"input": "4"
-			},
-			{
-				"label": "X1",
-				"input": "6"
+				"input": "3"
 			}
 		],
 		"solution": {
-			"X1": true,
 			"X0": true
 		},
-		"minMoves": 3
+		"minMoves": 1
 	},
 	{
 		"id": 8,
@@ -415,17 +348,13 @@
 			},
 			{
 				"label": "I2"
-			},
-			{
-				"label": "I3"
 			}
 		],
 		"gates": [
 			{
 				"label": "0",
-				"type": "OR",
+				"type": "NOT",
 				"inputs": {
-					"1": "I2",
 					"0": "I0"
 				}
 			},
@@ -439,70 +368,44 @@
 			},
 			{
 				"label": "2",
-				"type": "NOT",
+				"type": "AND",
 				"inputs": {
-					"0": "1"
+					"1": "1",
+					"0": "0"
 				}
 			},
 			{
 				"label": "3",
 				"type": "AND",
 				"inputs": {
-					"1": "2",
-					"0": "I3"
-				}
-			},
-			{
-				"label": "4",
-				"type": "AND",
-				"inputs": {
-					"1": "3",
-					"0": "0"
-				}
-			},
-			{
-				"label": "5",
-				"type": "NOT",
-				"inputs": {
+					"1": "I2",
 					"0": "I0"
 				}
 			},
 			{
-				"label": "6",
-				"type": "NOT",
+				"label": "4",
+				"type": "OR",
 				"inputs": {
-					"0": "I1"
+					"1": "I1",
+					"0": "3"
 				}
 			},
 			{
-				"label": "7",
+				"label": "5",
 				"type": "AND",
 				"inputs": {
-					"1": "6",
-					"0": "5"
-				}
-			},
-			{
-				"label": "8",
-				"type": "AND",
-				"inputs": {
-					"1": "I3",
-					"0": "7"
+					"1": "4",
+					"0": "2"
 				}
 			}
 		],
 		"outputs": [
 			{
 				"label": "X0",
-				"input": "4"
-			},
-			{
-				"label": "X1",
-				"input": "8"
+				"input": "5"
 			}
 		],
 		"solution": {
-			"X1": true,
 			"X0": true
 		},
 		"minMoves": 2
@@ -526,14 +429,14 @@
 				"type": "XOR",
 				"inputs": {
 					"1": "I1",
-					"0": "I2"
+					"0": "I0"
 				}
 			},
 			{
 				"label": "1",
-				"type": "XOR",
+				"type": "XNOR",
 				"inputs": {
-					"1": "I1",
+					"1": "I2",
 					"0": "I0"
 				}
 			},
@@ -542,7 +445,56 @@
 				"type": "AND",
 				"inputs": {
 					"1": "1",
+					"0": "0"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"label": "X0",
+				"input": "2"
+			}
+		],
+		"solution": {
+			"X0": true
+		},
+		"minMoves": 1
+	},
+	{
+		"id": 10,
+		"inputs": [
+			{
+				"label": "I0"
+			},
+			{
+				"label": "I1"
+			},
+			{
+				"label": "I2"
+			}
+		],
+		"gates": [
+			{
+				"label": "0",
+				"type": "AND",
+				"inputs": {
+					"1": "I2",
+					"0": "I0"
+				}
+			},
+			{
+				"label": "1",
+				"type": "NOT",
+				"inputs": {
 					"0": "I2"
+				}
+			},
+			{
+				"label": "2",
+				"type": "NOR",
+				"inputs": {
+					"1": "1",
+					"0": "I1"
 				}
 			},
 			{
@@ -566,7 +518,57 @@
 		"minMoves": 2
 	},
 	{
-		"id": 10,
+		"id": 11,
+		"inputs": [
+			{
+				"label": "I0"
+			},
+			{
+				"label": "I1"
+			},
+			{
+				"label": "I2"
+			}
+		],
+		"gates": [
+			{
+				"label": "0",
+				"type": "AND",
+				"inputs": {
+					"1": "I1",
+					"0": "I0"
+				}
+			},
+			{
+				"label": "1",
+				"type": "XOR",
+				"inputs": {
+					"1": "I2",
+					"0": "I1"
+				}
+			},
+			{
+				"label": "2",
+				"type": "XOR",
+				"inputs": {
+					"1": "1",
+					"0": "0"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"label": "X0",
+				"input": "2"
+			}
+		],
+		"solution": {
+			"X0": true
+		},
+		"minMoves": 1
+	},
+	{
+		"id": 12,
 		"inputs": [
 			{
 				"label": "I0"
@@ -589,7 +591,7 @@
 			},
 			{
 				"label": "1",
-				"type": "NOR",
+				"type": "OR",
 				"inputs": {
 					"1": "I2",
 					"0": "I1"
@@ -597,7 +599,7 @@
 			},
 			{
 				"label": "2",
-				"type": "XOR",
+				"type": "NAND",
 				"inputs": {
 					"1": "1",
 					"0": "0"
@@ -605,9 +607,8 @@
 			},
 			{
 				"label": "3",
-				"type": "AND",
+				"type": "NOT",
 				"inputs": {
-					"1": "1",
 					"0": "2"
 				}
 			}
@@ -624,7 +625,397 @@
 		"minMoves": 1
 	},
 	{
-		"id": 11,
+		"id": 13,
+		"inputs": [
+			{
+				"label": "I0"
+			},
+			{
+				"label": "I1"
+			},
+			{
+				"label": "I2"
+			}
+		],
+		"gates": [
+			{
+				"label": "0",
+				"type": "NOT",
+				"inputs": {
+					"0": "I1"
+				}
+			},
+			{
+				"label": "1",
+				"type": "AND",
+				"inputs": {
+					"1": "0",
+					"0": "I0"
+				}
+			},
+			{
+				"label": "2",
+				"type": "AND",
+				"inputs": {
+					"1": "I2",
+					"0": "I1"
+				}
+			},
+			{
+				"label": "3",
+				"type": "OR",
+				"inputs": {
+					"1": "2",
+					"0": "1"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"label": "X0",
+				"input": "3"
+			}
+		],
+		"solution": {
+			"X0": true
+		},
+		"minMoves": 1
+	},
+	{
+		"id": 14,
+		"inputs": [
+			{
+				"label": "I0"
+			},
+			{
+				"label": "I1"
+			},
+			{
+				"label": "I2"
+			}
+		],
+		"gates": [
+			{
+				"label": "0",
+				"type": "AND",
+				"inputs": {
+					"1": "I1",
+					"0": "I0"
+				}
+			},
+			{
+				"label": "1",
+				"type": "XOR",
+				"inputs": {
+					"1": "I1",
+					"0": "I0"
+				}
+			},
+			{
+				"label": "2",
+				"type": "AND",
+				"inputs": {
+					"1": "I2",
+					"0": "1"
+				}
+			},
+			{
+				"label": "3",
+				"type": "OR",
+				"inputs": {
+					"1": "2",
+					"0": "0"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"label": "X0",
+				"input": "3"
+			}
+		],
+		"solution": {
+			"X0": true
+		},
+		"minMoves": 2
+	},
+	{
+		"id": 15,
+		"inputs": [
+			{
+				"label": "I0"
+			},
+			{
+				"label": "I1"
+			},
+			{
+				"label": "I2"
+			},
+			{
+				"label": "I3"
+			}
+		],
+		"gates": [
+			{
+				"label": "0",
+				"type": "XNOR",
+				"inputs": {
+					"1": "I1",
+					"0": "I0"
+				}
+			},
+			{
+				"label": "1",
+				"type": "NOT",
+				"inputs": {
+					"0": "0"
+				}
+			},
+			{
+				"label": "2",
+				"type": "NAND",
+				"inputs": {
+					"1": "I2",
+					"0": "I1"
+				}
+			},
+			{
+				"label": "3",
+				"type": "XNOR",
+				"inputs": {
+					"1": "I3",
+					"0": "I2"
+				}
+			},
+			{
+				"label": "4",
+				"type": "NOR",
+				"inputs": {
+					"1": "3",
+					"0": "2"
+				}
+			},
+			{
+				"label": "5",
+				"type": "AND",
+				"inputs": {
+					"1": "4",
+					"0": "1"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"label": "X0",
+				"input": "5"
+			}
+		],
+		"solution": {
+			"X0": true
+		},
+		"minMoves": 2
+	},
+	{
+		"id": 16,
+		"inputs": [
+			{
+				"label": "I0"
+			},
+			{
+				"label": "I1"
+			},
+			{
+				"label": "I2"
+			},
+			{
+				"label": "I3"
+			}
+		],
+		"gates": [
+			{
+				"label": "0",
+				"type": "AND",
+				"inputs": {
+					"1": "I3",
+					"0": "I2"
+				}
+			},
+			{
+				"label": "1",
+				"type": "AND",
+				"inputs": {
+					"1": "I1",
+					"0": "I0"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"label": "X0",
+				"input": "0"
+			},
+			{
+				"label": "X1",
+				"input": "1"
+			}
+		],
+		"solution": {
+			"X1": true,
+			"X0": true
+		},
+		"minMoves": 4
+	},
+	{
+		"id": 17,
+		"inputs": [
+			{
+				"label": "I0"
+			},
+			{
+				"label": "I1"
+			},
+			{
+				"label": "I2"
+			}
+		],
+		"gates": [
+			{
+				"label": "0",
+				"type": "NOT",
+				"inputs": {
+					"0": "I1"
+				}
+			},
+			{
+				"label": "1",
+				"type": "OR",
+				"inputs": {
+					"1": "0",
+					"0": "I0"
+				}
+			},
+			{
+				"label": "2",
+				"type": "AND",
+				"inputs": {
+					"1": "I2",
+					"0": "I1"
+				}
+			},
+			{
+				"label": "3",
+				"type": "NOT",
+				"inputs": {
+					"0": "2"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"label": "X0",
+				"input": "1"
+			},
+			{
+				"label": "X1",
+				"input": "3"
+			}
+		],
+		"solution": {
+			"X1": false,
+			"X0": false
+		},
+		"minMoves": 2
+	},
+	{
+		"id": 18,
+		"inputs": [
+			{
+				"label": "I0"
+			},
+			{
+				"label": "I1"
+			},
+			{
+				"label": "I2"
+			},
+			{
+				"label": "I3"
+			}
+		],
+		"gates": [
+			{
+				"label": "0",
+				"type": "OR",
+				"inputs": {
+					"1": "I2",
+					"0": "I0"
+				}
+			},
+			{
+				"label": "1",
+				"type": "NOT",
+				"inputs": {
+					"0": "0"
+				}
+			},
+			{
+				"label": "2",
+				"type": "NOT",
+				"inputs": {
+					"0": "I2"
+				}
+			},
+			{
+				"label": "3",
+				"type": "AND",
+				"inputs": {
+					"1": "2",
+					"0": "I1"
+				}
+			},
+			{
+				"label": "4",
+				"type": "OR",
+				"inputs": {
+					"1": "3",
+					"0": "1"
+				}
+			},
+			{
+				"label": "5",
+				"type": "OR",
+				"inputs": {
+					"1": "I3",
+					"0": "I2"
+				}
+			},
+			{
+				"label": "6",
+				"type": "AND",
+				"inputs": {
+					"1": "5",
+					"0": "0"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"label": "X0",
+				"input": "4"
+			},
+			{
+				"label": "X1",
+				"input": "6"
+			}
+		],
+		"solution": {
+			"X1": true,
+			"X0": true
+		},
+		"minMoves": 3
+	},
+	{
+		"id": 19,
 		"inputs": [
 			{
 				"label": "I0"
@@ -650,16 +1041,17 @@
 			},
 			{
 				"label": "1",
-				"type": "OR",
+				"type": "XNOR",
 				"inputs": {
-					"1": "I2",
-					"0": "I1"
+					"1": "0",
+					"0": "I0"
 				}
 			},
 			{
 				"label": "2",
-				"type": "NOT",
+				"type": "OR",
 				"inputs": {
+					"1": "I3",
 					"0": "I2"
 				}
 			},
@@ -668,30 +1060,45 @@
 				"type": "AND",
 				"inputs": {
 					"1": "2",
-					"0": "I3"
-				}
-			},
-			{
-				"label": "4",
-				"type": "NAND",
-				"inputs": {
-					"1": "3",
 					"0": "1"
 				}
 			},
 			{
+				"label": "4",
+				"type": "NOT",
+				"inputs": {
+					"0": "I2"
+				}
+			},
+			{
 				"label": "5",
+				"type": "NAND",
+				"inputs": {
+					"1": "I3",
+					"0": "I2"
+				}
+			},
+			{
+				"label": "6",
 				"type": "AND",
 				"inputs": {
-					"1": "4",
-					"0": "0"
+					"1": "5",
+					"0": "4"
+				}
+			},
+			{
+				"label": "7",
+				"type": "AND",
+				"inputs": {
+					"1": "6",
+					"0": "3"
 				}
 			}
 		],
 		"outputs": [
 			{
 				"label": "X0",
-				"input": "5"
+				"input": "7"
 			}
 		],
 		"solution": {
@@ -700,7 +1107,341 @@
 		"minMoves": 1
 	},
 	{
-		"id": 12,
+		"id": 20,
+		"inputs": [
+			{
+				"label": "I0"
+			},
+			{
+				"label": "I1"
+			},
+			{
+				"label": "I2"
+			},
+			{
+				"label": "I3"
+			}
+		],
+		"gates": [
+			{
+				"label": "0",
+				"type": "AND",
+				"inputs": {
+					"1": "I1",
+					"0": "I0"
+				}
+			},
+			{
+				"label": "1",
+				"type": "AND",
+				"inputs": {
+					"1": "I2",
+					"0": "0"
+				}
+			},
+			{
+				"label": "2",
+				"type": "XNOR",
+				"inputs": {
+					"1": "I3",
+					"0": "0"
+				}
+			},
+			{
+				"label": "3",
+				"type": "XNOR",
+				"inputs": {
+					"1": "2",
+					"0": "I2"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"label": "X0",
+				"input": "1"
+			},
+			{
+				"label": "X1",
+				"input": "3"
+			}
+		],
+		"solution": {
+			"X1": false,
+			"X0": true
+		},
+		"minMoves": 3
+	},
+	{
+		"id": 21,
+		"inputs": [
+			{
+				"label": "I0"
+			},
+			{
+				"label": "I1"
+			},
+			{
+				"label": "I2"
+			},
+			{
+				"label": "I3"
+			}
+		],
+		"gates": [
+			{
+				"label": "0",
+				"type": "NOT",
+				"inputs": {
+					"0": "I1"
+				}
+			},
+			{
+				"label": "1",
+				"type": "AND",
+				"inputs": {
+					"1": "0",
+					"0": "I0"
+				}
+			},
+			{
+				"label": "2",
+				"type": "NOT",
+				"inputs": {
+					"0": "I3"
+				}
+			},
+			{
+				"label": "3",
+				"type": "AND",
+				"inputs": {
+					"1": "2",
+					"0": "I2"
+				}
+			},
+			{
+				"label": "4",
+				"type": "AND",
+				"inputs": {
+					"1": "3",
+					"0": "1"
+				}
+			},
+			{
+				"label": "5",
+				"type": "XNOR",
+				"inputs": {
+					"1": "I3",
+					"0": "3"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"label": "X0",
+				"input": "4"
+			},
+			{
+				"label": "X1",
+				"input": "5"
+			}
+		],
+		"solution": {
+			"X1": false,
+			"X0": true
+		},
+		"minMoves": 2
+	},
+	{
+		"id": 22,
+		"inputs": [
+			{
+				"label": "I0"
+			},
+			{
+				"label": "I1"
+			},
+			{
+				"label": "I2"
+			}
+		],
+		"gates": [
+			{
+				"label": "0",
+				"type": "NOT",
+				"inputs": {
+					"0": "I0"
+				}
+			},
+			{
+				"label": "1",
+				"type": "AND",
+				"inputs": {
+					"1": "I1",
+					"0": "0"
+				}
+			},
+			{
+				"label": "2",
+				"type": "NOT",
+				"inputs": {
+					"0": "I1"
+				}
+			},
+			{
+				"label": "3",
+				"type": "AND",
+				"inputs": {
+					"1": "2",
+					"0": "I0"
+				}
+			},
+			{
+				"label": "4",
+				"type": "OR",
+				"inputs": {
+					"1": "3",
+					"0": "1"
+				}
+			},
+			{
+				"label": "5",
+				"type": "XNOR",
+				"inputs": {
+					"1": "I2",
+					"0": "I1"
+				}
+			},
+			{
+				"label": "6",
+				"type": "NOT",
+				"inputs": {
+					"0": "5"
+				}
+			},
+			{
+				"label": "7",
+				"type": "OR",
+				"inputs": {
+					"1": "6",
+					"0": "3"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"label": "X0",
+				"input": "4"
+			},
+			{
+				"label": "X1",
+				"input": "7"
+			}
+		],
+		"solution": {
+			"X1": false,
+			"X0": true
+		},
+		"minMoves": 2
+	},
+	{
+		"id": 23,
+		"inputs": [
+			{
+				"label": "I0"
+			},
+			{
+				"label": "I1"
+			},
+			{
+				"label": "I2"
+			},
+			{
+				"label": "I3"
+			}
+		],
+		"gates": [
+			{
+				"label": "0",
+				"type": "NOT",
+				"inputs": {
+					"0": "I1"
+				}
+			},
+			{
+				"label": "1",
+				"type": "XNOR",
+				"inputs": {
+					"1": "0",
+					"0": "I0"
+				}
+			},
+			{
+				"label": "2",
+				"type": "XOR",
+				"inputs": {
+					"0": "1"
+				}
+			},
+			{
+				"label": "3",
+				"type": "OR",
+				"inputs": {
+					"1": "I2",
+					"0": "I1"
+				}
+			},
+			{
+				"label": "4",
+				"type": "XOR",
+				"inputs": {
+					"1": "3",
+					"0": "2"
+				}
+			},
+			{
+				"label": "5",
+				"type": "XOR",
+				"inputs": {
+					"1": "I3",
+					"0": "I2"
+				}
+			},
+			{
+				"label": "6",
+				"type": "NAND",
+				"inputs": {
+					"1": "5",
+					"0": "I2"
+				}
+			},
+			{
+				"label": "7",
+				"type": "AND",
+				"inputs": {
+					"1": "6",
+					"0": "3"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"label": "X0",
+				"input": "4"
+			},
+			{
+				"label": "X1",
+				"input": "7"
+			}
+		],
+		"solution": {
+			"X1": true,
+			"X0": false
+		},
+		"minMoves": 2
+	},
+	{
+		"id": 24,
 		"inputs": [
 			{
 				"label": "I0"
