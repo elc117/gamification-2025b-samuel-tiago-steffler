@@ -23,6 +23,8 @@ public class LevelManager {
         return instance;
     }
 
+
+
     /**
      * Carrega todos os níveis do jogo
      */
@@ -31,10 +33,41 @@ public class LevelManager {
             JSONtoCircuit converter = new JSONtoCircuit();
             levels = converter.convert(Gdx.files.internal("levels/levels.json"), true);
             Gdx.app.log("LevelManager", "Carregados " + levels.size + " níveis");
+
+            // Sincroniza o estado dos níveis com o progresso salvo
+            syncLevelsWithProgress();
         } catch (Exception e) {
             Gdx.app.error("LevelManager", "Erro ao carregar níveis", e);
             levels = new Array<>();
         }
+    }
+
+    /**
+     * Sincroniza o estado dos níveis (estrelas, completed, unlocked) com o LevelProgress
+     */
+    private void syncLevelsWithProgress() {
+        LevelProgress progress = LevelProgress.getInstance();
+
+        for (int i = 0; i < levels.size; i++) {
+            Level level = levels.get(i);
+            if (level != null) {
+                // Carrega estrelas salvas
+                int savedStars = progress.getLevelStars(i);
+                level.setStars(savedStars);
+
+                // Atualiza estado de completado
+                boolean completed = progress.isLevelCompleted(i);
+                level.setCompleted(completed);
+
+                // Atualiza estado de desbloqueado baseado no LevelProgress
+                // O primeiro nível sempre está desbloqueado
+                boolean unlocked = progress.isLevelUnlocked(i);
+                level.setUnlocked(unlocked);
+
+                Gdx.app.log("LevelManager", "Nivel " + i + ": unlocked=" + unlocked + ", completed=" + completed + ", stars=" + savedStars);
+            }
+        }
+        Gdx.app.log("LevelManager", "Progresso sincronizado. Maior nível desbloqueado: " + progress.getHighestLevelUnlocked());
     }
 
     /**

@@ -86,28 +86,29 @@ public class LevelsScreen implements Screen {
         backgroundImage.setFillParent(true);
         stage.addActor(backgroundImage);
 
-        // Cria tabela para os botoes de niveis
+        // tabela para os botoes de niveis
         levelsTable = new Table();
-        levelsTable.setFillParent(true); // Preenche a tela toda
+        levelsTable.setFillParent(true);
+        levelsTable.padTop(130);
         stage.addActor(levelsTable);
 
         float scale = 0.5f;
 
-        // Configura botao de up
+        // botao de up
         ImageButton.ImageButtonStyle upButtonStyle = new ImageButton.ImageButtonStyle();
         upButtonStyle.imageUp = new TextureRegionDrawable(buttonUpTexture);
         upButton = new ImageButton(upButtonStyle);
         float upBtnWidth = buttonUpTexture.getWidth();
         float upBtnHeight = buttonUpTexture.getHeight();
 
-        // Configura botao de down
+        // botao de down
         ImageButton.ImageButtonStyle downButtonStyle = new ImageButton.ImageButtonStyle();
         downButtonStyle.imageUp = new TextureRegionDrawable(buttonDownTexture);
         downButton = new ImageButton(downButtonStyle);
         float downBtnWidth = buttonDownTexture.getWidth();
         float downBtnHeight = buttonDownTexture.getHeight();
 
-        // Configura botao de back
+        // botao de back
         ImageButton.ImageButtonStyle backButtonStyle = new ImageButton.ImageButtonStyle();
         backButtonStyle.imageUp = new TextureRegionDrawable(buttonBackTexture);
         final ImageButton backButton = new ImageButton(backButtonStyle);
@@ -115,7 +116,7 @@ public class LevelsScreen implements Screen {
         float backBtnWidth = buttonBackTexture.getWidth();
         float backBtnHeight = buttonBackTexture.getHeight();
 
-        // Define tamanho e posicao dos botoes de navegacao
+        // tamanho e posicao dos botoes de navegacao
         upButton.setSize(upBtnWidth * scale, upBtnHeight * scale);
         upButton.setPosition((BitItGame.VIRTUAL_WIDTH - upBtnWidth * scale) / 2, 725);
         stage.addActor(upButton);
@@ -184,8 +185,9 @@ public class LevelsScreen implements Screen {
 
                     boolean unlocked = levelManager.getLevel(levelIndex).isUnlocked();
                     boolean completed = levelManager.getLevel(levelIndex).isCompleted();
+                    int stars = levelManager.getLevel(levelIndex).getStars();
 
-                    final LevelButton levelBtn = new LevelButton(levelIndex, unlocked, completed, game.font);
+                    final LevelButton levelBtn = new LevelButton(levelIndex, unlocked, completed, stars, game.font);
                     levelButtons.add(levelBtn);
 
                     // Adiciona listener se estiver desbloqueado
@@ -195,14 +197,14 @@ public class LevelsScreen implements Screen {
                             @Override
                             public void clicked(InputEvent event, float x, float y) {
                                 Gdx.app.log("LevelsScreen", "Nivel " + (finalLevelIndex + 1) + " clicado");
-                                //dispose();                
+                                //dispose();
                                 game.getLevelManager().setCurrLevelIdx(finalLevelIndex);
                                 game.setScreen(new GameScreen(game, finalLevelIndex));
                             }
                         });
                     }
-                    Gdx.app.log("LevelsScreen", "Adicionando nivel " + (levelIndex + 1) + " (Desbloqueado: " + unlocked + ", Completado: " + completed + ") na pos (" + row + ", " + col + ")");
-                    levelsTable.add(levelBtn).size(110, 110).pad(10);
+                    Gdx.app.log("LevelsScreen", "Adicionando nivel " + (levelIndex + 1) + " (Desbloqueado: " + unlocked + ", Completado: " + completed + ", Estrelas: " + stars + ") na pos (" + row + ", " + col + ")");
+                    levelsTable.add(levelBtn).size(180, 180).pad(10); // Aumenta o tamanho do botão na tabela
                 } else {
                     // Celula vazia
                     levelsTable.add().size(110, 110).pad(10);

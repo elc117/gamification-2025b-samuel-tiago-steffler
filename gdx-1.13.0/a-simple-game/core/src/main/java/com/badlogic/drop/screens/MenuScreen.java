@@ -21,6 +21,7 @@ public class MenuScreen implements Screen {
     private Texture backgroundTexture;
     private Texture playButtonTexture;
     private Texture creditsButtonTexture;
+    private Texture howToPlayTexture;
     private Image backgroundImage;
 
     public MenuScreen(final BitItGame game) {
@@ -31,6 +32,7 @@ public class MenuScreen implements Screen {
             backgroundImage = new Image(backgroundTexture);
             backgroundImage.setScale(0.5f);
             playButtonTexture = new Texture(Gdx.files.internal("textures/UI/playbutton.png"));
+            howToPlayTexture = new Texture(Gdx.files.internal("textures/UI/howtoplaybtn.png"));
             creditsButtonTexture = new Texture(Gdx.files.internal("textures/UI/creditsbutton.png"));
         } catch (Exception e) {
             Gdx.app.error("MenuScreen", "Erro ao carregar texturas", e);
@@ -50,6 +52,13 @@ public class MenuScreen implements Screen {
         float playBtnHeight = playButtonTexture.getHeight();
         float scale = 0.5f;
 
+        // Configura botao de hot to play
+        ImageButton.ImageButtonStyle howToPlayButtonStyle = new ImageButton.ImageButtonStyle();
+        howToPlayButtonStyle.imageUp = new TextureRegionDrawable(howToPlayTexture);
+        final ImageButton howPlayButton = new ImageButton(howToPlayButtonStyle);
+        float howPlayBtnWidth = howToPlayTexture.getWidth();
+        float howPlayBtnHeight = howToPlayTexture.getHeight();
+
         // Configura botao de credits
         ImageButton.ImageButtonStyle creditsButtonStyle = new ImageButton.ImageButtonStyle();
         creditsButtonStyle.imageUp = new TextureRegionDrawable(creditsButtonTexture);
@@ -64,6 +73,16 @@ public class MenuScreen implements Screen {
                 Gdx.app.log("MenuScreen", "Botao play clicado em: " + x + ", " + y);
                 game.setScreen(new LevelsScreen(game));
                 dispose();
+            }
+        });
+
+        // Listener para clique do botao de How to Play
+        howPlayButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.app.log("MenuScreen", "Botao how to play clicado em: " + x + ", " + y);
+                //game.setScreen(new LevelsScreen(game));
+                //dispose();
             }
         });
 

@@ -238,6 +238,10 @@ public class LevelCompletePopUp {
         return visible;
     }
 
+    public boolean isPeeking() {
+        return isPeeking;
+    }
+
     // jeitinho de conseguir renderizar o menu sobre o circuito sobre o bkg
     public void draw() {
         if (!visible) return;

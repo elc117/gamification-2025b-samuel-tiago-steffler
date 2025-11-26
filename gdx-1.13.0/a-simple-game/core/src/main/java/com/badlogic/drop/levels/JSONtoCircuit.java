@@ -113,6 +113,12 @@ public class JSONtoCircuit {
             Level newLevel = new Level(id, levelCir);
             int minMoves = level.getInt("minMoves", 1); // Padrão 1 se não especificado
             newLevel.setMinMoves(minMoves);
+
+            // Inicializa todos os niveis como bloqueados (exceto o primeiro)
+            newLevel.setUnlocked(id == 0); // Apenas o primeiro nível começa desbloqueado
+            newLevel.setCompleted(false);
+            newLevel.setStars(0);
+
             if(debug) Gdx.app.log("JSONtoCircuit.convert", "minMoves do nivel " + id + ": " + minMoves);
 
             levelArr.add(newLevel);

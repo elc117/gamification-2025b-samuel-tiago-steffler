@@ -6,6 +6,7 @@ import com.badlogic.drop.entities.gates.InputBits;
 import com.badlogic.drop.levels.Level;
 import com.badlogic.drop.levels.LevelManager;
 import com.badlogic.drop.levels.LevelProgress;
+import com.badlogic.drop.ui.ExpectedOutputs;
 import com.badlogic.drop.ui.WireRenderer;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -18,14 +19,13 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
+//import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 /**
  * Tela principal de jogo onde o jogador interage com o circuito logico
- * TEMPORARIO - geracao do circuito esta na branch "samuel"
  */
 public class GameScreen implements Screen {
     private final BitItGame game;
@@ -45,10 +45,11 @@ public class GameScreen implements Screen {
 
     private final Vector2 touchPos;
     private final BitmapFont debugFont;
-    private final Label movesLabel;
+    //private final Label movesLabel;
 
     private final MenuPopup menuPopup;
     private final LevelCompletePopUp levelupPopup;
+    private ExpectedOutputs expectedOutputsPanel;
 
     private boolean levelCompleted = false;
     private boolean firstMove = false;
@@ -88,9 +89,9 @@ public class GameScreen implements Screen {
         debugFont.getData().setScale(1.5f);
 
         // label de movimentos
-        movesLabel = new Label("Moves: 0", new Label.LabelStyle(debugFont, Color.WHITE));
-        movesLabel.setPosition(10, BitItGame.VIRTUAL_HEIGHT - 40);
-        stage.addActor(movesLabel);
+        //movesLabel = new Label("Moves: 0", new Label.LabelStyle(debugFont, Color.WHITE));
+        //movesLabel.setPosition(10, BitItGame.VIRTUAL_HEIGHT - 40);
+        //stage.addActor(movesLabel);
 
         // menu popup
         menuPopup = new MenuPopup(stage, BitItGame.VIRTUAL_WIDTH, BitItGame.VIRTUAL_HEIGHT);
@@ -165,6 +166,14 @@ public class GameScreen implements Screen {
                 }
                 game.batch.end();
 
+                // Cria painel de saídas esperadas no topo da tela
+                float yPosition = BitItGame.VIRTUAL_HEIGHT - 105; // 120 pixels do topo
+                expectedOutputsPanel = new ExpectedOutputs(
+                    circuit.getExpectedOutput(),
+                    BitItGame.VIRTUAL_WIDTH,
+                    yPosition
+                );
+
                 Gdx.app.log("GameScreen", "Nivel " + (levelId + 1) + " carregado com sucesso");
             } else {
                 Gdx.app.error("GameScreen", "Nivel " + levelId + " não encontrado!");
@@ -186,7 +195,7 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // Atualiza o texto
-        movesLabel.setText("Moves: " + moves);
+        //movesLabel.setText("Moves: " + moves);
 
         viewport = stage.getViewport();
         handleInput();
@@ -220,6 +229,13 @@ public class GameScreen implements Screen {
             game.batch.end();
         }
 
+        // Desenha painel de saídas esperadas
+        if (expectedOutputsPanel != null) {
+            game.batch.begin();
+            expectedOutputsPanel.render(game.batch);
+            game.batch.end();
+        }
+
         // desenhar menu
         if (menuPopup != null && menuPopup.isVisible()) {
             menuPopup.draw();
@@ -231,9 +247,9 @@ public class GameScreen implements Screen {
         }
 
         // desenhar labels da UI
-        game.batch.begin();
-        movesLabel.draw(game.batch, 1);
-        game.batch.end();
+        //game.batch.begin();
+        //movesLabel.draw(game.batch, 1);
+        //game.batch.end();
 
         // Desenha informações de debug
         // game.batch.begin();
@@ -248,7 +264,7 @@ public class GameScreen implements Screen {
      */
     private void handleInput() {
         // Bloquear todas as entradas se o popup de level up estiver visível
-        if (levelupPopup != null && levelupPopup.isVisible()) {
+        if (levelupPopup != null && (levelupPopup.isVisible() || levelupPopup.isPeeking())) {
             return;
         }
 
@@ -328,9 +344,19 @@ public class GameScreen implements Screen {
             LevelProgress levelProgress = LevelProgress.getInstance();
             levelProgress.setLevelCompleted(levelId, true);
 
-            // atualiza dados do nivel atual no LevelManager
+            // Salva estrelas apenas se for uma pontuação melhor
+            boolean improvedScore = levelProgress.setLevelStars(levelId, stars);
+            if (improvedScore) {
+                Gdx.app.log("GameScreen", "Nova melhor pontuação! " + stars + " estrelas salvas.");
+            } else {
+                int previousBest = levelProgress.getLevelStars(levelId);
+                Gdx.app.log("GameScreen", "Pontuação atual (" + stars + ") não superou a melhor (" + previousBest + ")");
+            }
+
+            // atualiza dados do nivel atual no LevelManager com a melhor pontuação
             levelManager.getLevel(levelId).setCompleted(true);
-            levelManager.getLevel(levelId).setStars(stars);
+            int bestStars = levelProgress.getLevelStars(levelId);
+            levelManager.getLevel(levelId).setStars(bestStars);
             if (levelId + 1 < levelManager.getTotalLevels()) {
                 levelManager.getLevel(levelId + 1).setUnlocked(true);
             }
@@ -345,18 +371,24 @@ public class GameScreen implements Screen {
 
     /**
      * Calcula o número de estrelas baseado nos movimentos
-     * 3 estrelas: moves == minMoves (solução perfeita)
-     * 2 estrelas: moves == minMoves + 1
+     * 3 estrelas: moves == minMoves (solucao perfeita)
+     * 2 estrelas: moves <= minMoves + 2 (1 bit flipado sem querer)
      * 1 estrela: acima disso
      */
     private int calculateStars(int moves, int minMoves) {
-        if (moves == minMoves) {
-            return 3;
-        } else if (moves == minMoves + 2) {
-            return 2;
-        } else {
-            return 1;
+        if (moves < minMoves) {
+            moves = minMoves;
         }
+
+        int score = 1;
+        if (moves <= minMoves + 2) {
+            score++;
+        }
+        if (moves == minMoves) {
+            score++;
+        }
+
+        return score;
     }
 
     @Override
@@ -383,6 +415,7 @@ public class GameScreen implements Screen {
         if (debugFont != null) debugFont.dispose();
         if (game.batch != null) game.batch.dispose();
         if (menuPopup != null) menuPopup.dispose();
+        if (expectedOutputsPanel != null) expectedOutputsPanel.dispose();
 
         // texturas dos gates
         if (circuit != null) {

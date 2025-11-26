@@ -24,10 +24,10 @@ public abstract class LogicGate {
     // tipo de porta logica
     protected String gateType;
     protected String label; // Ex: "A", "B", "Input 1"
-    
+
     // nivel no circuito (0 = inputs, n = outputs) para desenho (circuito sera feito de baixo para cima)
     protected int level;
-    
+
     // disposicao horizontal para o nivel de portas (usado pelo renderizador)
     protected int levelIdx;
 
@@ -46,34 +46,34 @@ public abstract class LogicGate {
         // dimensoes padrao
         this.width = 64f;
         this.height = 64f;
-        
+
         // Valores padrão para posicionamento dinâmico
         this.level = 0;
         this.levelIdx = 0;
     }
-    
+
     /**
      * Atualiza a posição do gate baseado no tamanho da tela.
      * Chamado quando a tela é redimensionada.
-     * 
+     *
      * @param screenWidth Largura da tela em pixels
      * @param screenHeight Altura da tela em pixels
      * @param levelTot Número total de níveis no circuito
      * @param gateLevel Número de gates neste nível
      */
-    public void updatePos(float screenWidth, float screenHeight, 
+    public void updatePos(float screenWidth, float screenHeight,
                                int levelTot, int gateLevel, boolean debugMode) {
 
 
         // ------------------ Margens - modificar se preciso ------------------
         float bottom = 50f;    // Espaço na parte inferior
-        float top = 150f;       // Espaço no topo
+        float top = 195f;       // Espaço no topo
         float sides = 70f;     // Espaço nas laterais
 
         // Altura util do circuito
         // vou descontar a altura do output ja que a renderizacao comeca no canto inferior esquerdo
         float aUtil = screenHeight - bottom - top;
-        
+
         // Calcula Y baseado no nivel (0 = bottom, totalLevels - 1 = top)
         float espacVer = levelTot > 1 ? (aUtil) / (levelTot - 1) : 0;
         float y = bottom + (level * espacVer);
@@ -90,8 +90,8 @@ public abstract class LogicGate {
         }
         //System.out.println("lUtil: " + lUtil + " espacHor: " + espacHor);
         //System.out.println("Largura total espacHor + gates: " + (espacHor * (gateLevel + 1) + gateLevel * getWidth()));
-        
-        
+
+
         // Calcula X baseado no indice dentro do nível
         float x;
         if (gateLevel == 1) {
@@ -103,9 +103,9 @@ public abstract class LogicGate {
         } else {
             // Distribui uniforme sem espacamento por fora
             x = sides + (levelIdx * (espacHor + getWidth())); // - this.getWidth() / 2;
-        }   
+        }
         if (debugMode) {
-            System.out.println("Gate " + gateType + " nivel " + level + " indice " + levelIdx + 
+            System.out.println("Gate " + gateType + " nivel " + level + " indice " + levelIdx +
                                " posicao atualizada para (" + x + ", " + y + ")");
         }
         this.position.set(x, y);
@@ -207,23 +207,23 @@ public abstract class LogicGate {
     public String getGateType() {
         return gateType;
     }
-    
+
     public int getLevel() {
         return level;
     }
-    
+
     public void setLevel(int level) {
         this.level = level;
     }
-    
+
     public int getLevelIdx() {
         return levelIdx;
     }
-    
+
     public void setLevelIdx(int levelIdx) {
         this.levelIdx = levelIdx;
     }
-    
+
     public String getLabel() {
         return label;
     }
