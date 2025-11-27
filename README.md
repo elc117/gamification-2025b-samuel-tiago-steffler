@@ -61,32 +61,13 @@ Interface foi adaptada para utilização tanto em desktop quanto em dispositivos
 
 ## 🖼️ Galeria de Imagens
 
-<div style="display:flex; gap:18px; justify-content:center; align-items:flex-start; flex-wrap:wrap;">
- <figure style="text-align:center; margin:0;">
-  <img src="gdx-1.13.0\a-simple-game\assets\readme\home.png" alt="Tela inicial" width="220" />
-  <figcaption>Tela inicial do jogo</figcaption>
- </figure>
+| Tela inicial do jogo | Tela de níveis com pontuação | Tela durante o jogo | Pop-up de vitória |
+|:---:|:---:|:---:|:---:|
+| ![Tela inicial](gdx-1.13.0/a-simple-game/assets/readme/home.png) | ![Tela de níveis](gdx-1.13.0/a-simple-game/assets/readme/levels.png) | ![Gameplay](gdx-1.13.0/a-simple-game/assets/readme/game.png) | ![Vitória](gdx-1.13.0/a-simple-game/assets/readme/win.png) |
 
- <figure style="text-align:center; margin:0;">
-  <img src="gdx-1.13.0\a-simple-game\assets\readme\levels.png" alt="Tela de menu de níveis" width="220" />
-  <figcaption>Tela de níveis com pontuação de níveis já desbloqueados</figcaption>
- </figure>
-
- <figure style="text-align:center; margin:0;">
-  <img src="gdx-1.13.0\a-simple-game\assets\readme\game.png" alt="Tela durante jogo" width="220" />
-  <figcaption>Tela durante o jogo</figcaption>
- </figure>
-
- <figure style="text-align:center; margin:0;">
-  <img src="gdx-1.13.0\a-simple-game\assets\readme\win.png" alt="Pop-up de vitória" width="220" />
-  <figcaption>Pop-up de vitória — três estrelas</figcaption>
- </figure>
-
- <figure style="text-align:center; margin:0;">
-  <img src="gdx-1.13.0\a-simple-game\assets\readme\circs.png" alt="Circuitos no LogiSim" width="220" />
-  <figcaption>Circuitos desenvolvidos pelo LogiSim para implementação no jogo</figcaption>
- </figure>
-</div>
+| Circuitos desenvolvidos no LogiSim para implementação no jogo |
+|:---:|
+| ![Circuitos LogiSim](gdx-1.13.0/a-simple-game/assets/readme/circs.png) |
 
 ## Diagrama de Classes
 
