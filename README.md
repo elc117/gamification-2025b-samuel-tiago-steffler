@@ -45,6 +45,8 @@ A parte gráfica envolvendo os elementos de circuito, como portas lógicas e bit
 
 Enquanto que Samuel focou o seu desenvolvimento na parte de criação da lógica do jogo, evaluação do circuito e renderização correta, Tiago foi encarregado de desenvolver a interface com navegabilidade entre menus, além de desenvolver o sistema de parsing dos níveis de texto escrito para JSON.
 
+A dificuldade extrema até o momento da entrega final (e não completamente solucionada) é a criação de um algoritmo inteligente de roteamento dos fios - que foi significativamente melhorado, mas apresenta algumas falhas em níveis mais complexos ou em casos específicos.
+
 A documentação do código foi feita em conjunto, assim como os testes e correção de bugs na etapa final do projeto.
 
 ## ❔ Como Jogar
