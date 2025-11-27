@@ -1,12 +1,6 @@
 {
 	"name": "Java Gradle Game Development",
 	"image": "mcr.microsoft.com/devcontainers/java:1-21-bullseye",
-	
-	"features": {
-		"ghcr.io/devcontainers/features/gradle:1": {
-			"version": "latest"
-		}
-	},
 
 	"customizations": {
 		"vscode": {
@@ -22,7 +16,7 @@
 
 	"forwardPorts": [8080],
 
-	"postCreateCommand": "java -version && gradle -v",
+	"postCreateCommand": "bash -c 'wget -q https://services.gradle.org/distributions/gradle-8.5-bin.zip && unzip -q gradle-8.5-bin.zip && sudo mv gradle-8.5 /opt/gradle && sudo ln -sf /opt/gradle/bin/gradle /usr/local/bin/gradle && rm gradle-8.5-bin.zip && java -version && gradle -v'",
 
 	"remoteUser": "vscode"
 }
