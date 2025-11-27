@@ -1,6 +1,7 @@
 package com.badlogic.drop.entities;
 
 import com.badlogic.drop.entities.gates.LogicGate;
+import com.badlogic.drop.entities.gates.ORGate;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
@@ -33,11 +34,13 @@ public final class Wire {
     protected Color activeColor;    // cor quando true
     protected Color inactiveColor;  // cor quando false
 
+    protected Array<LogicGate> gates; // referencia para todas as portas do circuito (usado para calcular o caminho)
+
     /**
      * Construtor de Wire padrao conectando a saída 0 de uma porta à entrada 0 de outra porta
      */
-    public Wire(LogicGate fromGate, LogicGate toGate) {
-        this(fromGate, 0, toGate, 0);
+    public Wire(LogicGate fromGate, LogicGate toGate, Array<LogicGate> gates) {
+        this(fromGate, 0, toGate, 0, gates);
     }
 
     /**
@@ -46,13 +49,15 @@ public final class Wire {
      * @param fromOutputIndex Índice da saída da porta de origem (geralmente 0)
      * @param toGate Porta de destino
      * @param toInputIndex Índice da entrada da porta de destino
+     * @param gatesArray de todas as portas lógicas do circuito
      */
-    public Wire(LogicGate fromGate, int fromOutputIndex, LogicGate toGate, int toInputIndex) {
+    public Wire(LogicGate fromGate, int fromOutputIndex, LogicGate toGate, int toInputIndex, Array<LogicGate> gates) {
         this.state = false;
         this.fromGate = fromGate;
         this.toGate = toGate;
         this.fromOutputIndex = fromOutputIndex;
         this.toInputIndex = toInputIndex;
+        this.gates = gates;
 
         // Cores padrão
         this.inactiveColor = new Color(1f, 1f, 1f, 1f);    // Branco quando inativo
@@ -108,12 +113,14 @@ public final class Wire {
         // Calcula a diferença de níveis para ajustar o comportamento do fio
         int levelDiff = Math.abs(toLevel - fromLevel);
 
-        // Determina qual elemento tem o Y maior (mais superior na tela)
-        float referenceY;
+        // Determina qual elemento tem o Y maior e menor (mais superior na tela)
+        float UpperReferenceY, LowerReferenceY;
         if (fromLevel > toLevel) {
-            referenceY = fromY;
+            UpperReferenceY = fromY;
+            LowerReferenceY = toY;
         } else {
-            referenceY = toY;
+            UpperReferenceY = toY;
+            LowerReferenceY = fromY;
         }
 
         // Altura do fio horizontal: parte do elemento mais superior
@@ -121,7 +128,7 @@ public final class Wire {
         float baseDistance = 38f;
         float xFactor = 13f; // separacao vertical baseada na posicao do gate na linha
         float levelDiffFactor = 15f; // Separação vertical adicional baseada em levelDiff
-        float horizontalY = referenceY - baseDistance - (fromLevelIdx * xFactor) - (levelDiff * levelDiffFactor);
+        float horizontalY = UpperReferenceY - baseDistance - (fromLevelIdx * xFactor) - (levelDiff * levelDiffFactor);
 
         // Ponto inicial (saída da porta de origem)
         pathPoints.add(new Vector2(fromX, fromY));
@@ -129,9 +136,33 @@ public final class Wire {
         if(debug) Gdx.app.log("Wire.calculatePath", "ponto 1: (" + fromX + ", " + fromY + ")");
 
 
+        // verifica a posicao do elemento imediato superior para caso abaixo
+        Array<LogicGate> superiorGates = new Array<>();
+        LogicGate lowerGate = (toGate.getY() < fromGate.getY()) ? toGate : fromGate;        // gate inferior
+        LogicGate upperGate = (toGate.getY() < fromGate.getY()) ? fromGate : toGate;        // gate superior
+        float lowerX = lowerGate.getX() + lowerGate.getWidth() / 2;
+        Gdx.app.log("Wire.calculatePath", "Analisando gates superiores entre " + lowerGate.getLabel() + " e " + upperGate.getLabel());
+        for (LogicGate gate : gates) {
 
-        // evitar pulos de mais de 1 nivel dos fios para evitar overlap com gates
-        if (levelDiff > 1) {
+            // analisa apenas gates entre os dois
+            if (gate.getLevel() > ((fromLevel < toLevel) ? fromLevel : toLevel) && gate.getLevel() < ((fromLevel > toLevel) ? fromLevel : toLevel)) {
+                float Xposgate = gate.getX() + gate.getWidth() / 2;
+
+                // intervalo para evitar: [ Xposgate - gate.getWidth()/2 - 20 .......... Xposgate + gate.getWidth()/2 + 20 ] margem de 20px
+                if ((lowerX < Xposgate + gate.getWidth()/2 + 10) && (lowerX > Xposgate - gate.getWidth()/2 - 10)) {
+                    // gate esta no caminho
+                    Gdx.app.log("Wire.calculatePath", " - gate superior no caminho: " + gate.getLabel());
+                    superiorGates.add(gate);
+                    continue;
+                }
+            } else continue;
+        }
+
+
+
+        // caso haja gates imediatamente superiores no caminho, calcula desvio
+        if (levelDiff > 1 && superiorGates.size > 0) {
+
             // calcula ponto de dobra vertical mais cedo
             float iniY = fromY + seglen * 0.7f;//S + (baseDistance * 0.5f);
 
@@ -139,9 +170,50 @@ public final class Wire {
             pathPoints.add(new Vector2(fromX, iniY));
             if(debug) Gdx.app.log("Wire.calculatePath", "ponto 2 (dobra cedo): (" + fromX + ", " + iniY + ")");
 
+            // analisa as gates superiores no caminho para definir o segmento horizontal
+            //boolean canBreakOnce = true;
+            //for (LogicGate gate : superiorGates){
+            //    // verifica se vai pra direita ou esquerda
+            //    if (toX < fromX){
+            //        // esquerda
+            //        if (toX > gate.getX() - gate.getWidth()/2 - 20){
+            //            // deve quebrar mais de uma vez
+            //            canBreakOnce = false;
+            //        } else continue;
+            //    } else {
+            //        // direita
+            //        if (toX < gate.getX() + gate.getWidth()/2 + 20){
+            //            // deve quebrar mais de uma vez
+            //            canBreakOnce = false;
+            //        }
+            //    }
+            //}
+
+            // fingir que estaria ligando em uma porta diretamente acima (para imitar altura de quebra)
+            // altura sera definida na gambiarra ja que nao temos acesso ao circuito como um todo
+            LogicGate fakeUpperGate = null;
+            for (LogicGate gate : gates){
+                if (gate.getLevel() == fromGate.getLevel() + 1){
+                    fakeUpperGate = gate;
+                    Gdx.app.log("Wire.calculatePath", " gate achado para usar altura: " + gate.getLabel());
+                    break;
+                }
+            }
+            if (fakeUpperGate == null){
+                // se nao achar, usar a porta superior direta
+                fakeUpperGate = upperGate;
+                Gdx.app.log("Wire.calculatePath", " nenhum gate de nivel 0 achado, usando o superior direto: " + fakeUpperGate.getLabel());
+            }
+            UpperReferenceY = fakeUpperGate.getY();
+            horizontalY = UpperReferenceY - baseDistance - (fromLevelIdx * xFactor) - (1 * levelDiffFactor);
+
+
             // ponto X intermediario
             float xDiff = toX - fromX;
             float iniX = fromX + (xDiff * 0.6f); // 60% da diferenca X entre inicio e fim
+
+
+
             //float iniX = toX;
             pathPoints.add(new Vector2(iniX, iniY));
             if(debug) Gdx.app.log("Wire.calculatePath", "ponto 3 (horizontal intermed): (" + iniX + ", " + iniY + ")");
@@ -153,8 +225,10 @@ public final class Wire {
             // segue horizontalmente até o X de destino
             pathPoints.add(new Vector2(toX, horizontalY));
             if(debug) Gdx.app.log("Wire.calculatePath", "ponto 5 (horizontal final): (" + toX + ", " + horizontalY + ")");
-        } else {
-            // padrao
+        }
+        // padrao
+        else {
+
             pathPoints.add(new Vector2(fromX, horizontalY));
             if(debug) Gdx.app.log("Wire.calculatePath", "ponto 2: (" + fromX + ", " + horizontalY + ")");
 

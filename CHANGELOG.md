@@ -132,10 +132,11 @@ Realease inicial do jogo "Bit it!" com todas as funcionalidades planejadas imple
 
 - Refatoração para adicionar novos níveis e balancear a dificuldade
 - Modificação na tela inicial do jogo
+- Modificação no sistema de renderização dos fios para melhorar a visualização
 
 ### Corrigido
 
-- Correções mínimas em bugs
+- Correções mínimas em bugs pontuais
 
 ### Documentação
 

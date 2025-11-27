@@ -136,7 +136,7 @@ public class CircuitBuilder {
         if (fromIndex >= gates.size || toIndex >= gates.size) {
             throw new IllegalArgumentException("Indice fora dos limites.");
         }
-        wires.add(new Wire(gates.get(fromIndex), gates.get(toIndex)));
+        wires.add(new Wire(gates.get(fromIndex), gates.get(toIndex), gates));
         return this;
     }
 
@@ -152,7 +152,7 @@ public class CircuitBuilder {
             throw new IllegalArgumentException("GIndice fora dos limites.");
         }
         wires.add(new Wire(gates.get(fromGateIndex), fromOutputIndex,
-                          gates.get(toGateIndex), toInputIndex));
+                          gates.get(toGateIndex), toInputIndex, gates));
         return this;
     }
 
@@ -174,7 +174,7 @@ public class CircuitBuilder {
             inputs.add(input);
         }
 
-        wires.add(new Wire(input, 0, getGate(to), gateInputIndex));
+        wires.add(new Wire(input, 0, getGate(to), gateInputIndex, gates));
         return this;
     }
 
@@ -206,21 +206,21 @@ public class CircuitBuilder {
         // Primeiro tenta encontrar como LogicGate
         LogicGate fromGate = getGate(from);
         if (fromGate != null) {
-            wires.add(new Wire(fromGate, fromOutputIndex, toGate, toInputIndex));
+            wires.add(new Wire(fromGate, fromOutputIndex, toGate, toInputIndex, gates));
             return this;
         }
 
         // Se não encontrou como gate, tenta como InputBits
         InputBits fromInput = getInput(from);
         if (fromInput != null) {
-            wires.add(new Wire(fromInput, fromOutputIndex, toGate, toInputIndex));
+            wires.add(new Wire(fromInput, fromOutputIndex, toGate, toInputIndex, gates));
             return this;
         }
 
         // Se não encontrou nem como gate nem como input, cria um input automaticamente
         fromInput = new InputBits(from, scale);
         inputs.add(fromInput);
-        wires.add(new Wire(fromInput, fromOutputIndex, toGate, toInputIndex));
+        wires.add(new Wire(fromInput, fromOutputIndex, toGate, toInputIndex, gates));
         return this;
     }
 
@@ -244,7 +244,7 @@ public class CircuitBuilder {
         }
 
         // Criação de um fio conectando a porta à saída
-        Wire wire = new Wire(getGate(gateLabel), 0, output, 0);
+        Wire wire = new Wire(getGate(gateLabel), 0, output, 0, gates);
         wires.add(wire);
         return this;
     }

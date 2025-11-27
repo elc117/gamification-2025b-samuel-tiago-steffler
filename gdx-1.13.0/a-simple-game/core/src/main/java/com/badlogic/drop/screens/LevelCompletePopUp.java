@@ -71,7 +71,7 @@ public class LevelCompletePopUp {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
               Gdx.app.log("LvlPopup", "touchUp - restaurando menu");
-              toggle();
+              if (isPeeking == true) toggle();
               isPeeking = false;
 
             }
