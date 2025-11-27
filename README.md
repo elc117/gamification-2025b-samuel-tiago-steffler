@@ -57,6 +57,8 @@ A tela inicial permite o acesso ao menu de níveis, configurações e instruçõ
 
 Interface foi adaptada para utilização tanto em desktop quanto em dispositivos móveis, assim como executando localmente ou pela web.
 
+**Você pode encontrar o jogo na web no seguinte link: <https://saveiroprf.itch.io/bit-it>**
+
 ## 🖼️ Galeria de Imagens
 
 <div style="display:flex; gap:18px; justify-content:center; align-items:flex-start; flex-wrap:wrap;">

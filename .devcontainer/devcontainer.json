@@ -1,0 +1,28 @@
+{
+	"name": "Java Gradle Game Development",
+	"image": "mcr.microsoft.com/devcontainers/java:1-21-bullseye",
+	
+	"features": {
+		"ghcr.io/devcontainers/features/gradle:1": {
+			"version": "latest"
+		}
+	},
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"vscjava.vscode-java-pack",
+				"vscjava.vscode-gradle"
+			],
+			"settings": {
+				"java.configuration.updateBuildConfiguration": "automatic"
+			}
+		}
+	},
+
+	"forwardPorts": [8080],
+
+	"postCreateCommand": "java -version && gradle -v",
+
+	"remoteUser": "vscode"
+}
